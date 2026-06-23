@@ -1,0 +1,9 @@
+# Academic year/semester folders (e.g. 2553-1, 2568-3)
+25[0-9][0-9]-*/
+
+# Database backup
+*.sql
+*.bak
+
+# XAMPP / PHP logs
+*.log

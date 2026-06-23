@@ -1,0 +1,35 @@
+# Project2 — Codex Instructions
+
+## Project Overview
+PHP web application for university academic project management (senior/thesis projects).
+Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
+
+## Local Development
+- Web root: `C:\xampp\htdocs\` — project must be symlinked or copied there to run
+- Local URL: `http://localhost/` (officer.php, student.php, teacher.php, etc.)
+- DB: MySQL via XAMPP, database name check via phpMyAdmin
+- No build step — plain PHP files served directly
+
+## Repository
+- GitHub: https://github.com/wivachr/Project2.git
+- Branch: `main`
+
+## File Structure
+- `officer.php` — admin portal (sidebar with jQuery `.load()` fragment loading)
+- `student/`, `teacher/`, `project/`, `exam/`, `report/` — feature modules loaded as fragments
+- `headofdepartment/` — change department head page
+- `year/` — change academic year/semester
+- `connectdatabase.php` — DB connection (included once per fragment; don't double-include)
+- `change.php` — session/auth check included at top of every page
+
+## Key Patterns
+- Pages loaded via jQuery `.load()` are HTML fragments — `<html>/<head>/<body>` tags are stripped, only body content renders
+- Use `href="javascript:void(0);"` not `href="#"` in fragment pages (hash changes break navigation)
+- Pagination and onclick links must not use bare `#`
+- String parameters in JS `onclick` handlers must be quoted via `json_encode()` — bare PHP variables become JS identifiers
+- Use `($_GET['page'] ?? null)` to avoid undefined index warnings
+- SQL deletions must go child → parent (assignexam → committee → exam → manipulator → projecthistory → project)
+
+## Git Rules
+- `.gitignore` excludes: `25[0-9][0-9]-*/` folders (academic year data), `*.sql`, `*.bak`, `*.log`
+- Never commit credential files or DB dumps

@@ -1,0 +1,23 @@
+﻿<? include('../change.php'); ?>
+<?
+$guma = explode(",", $temp);
+	include('../connectdatabase.php');
+	$sql = "select max(id_committee) from committee";
+	$result = mysqli_query($connect, $sql);
+	while($rs = mysqli_fetch_array($result))
+	{
+		$idcom = $rs[0]+1;
+	}
+	$sql = "insert into committee values('$idcom','$idteacher','$id','ประธาน')";
+	mysqli_query($connect, $sql);
+	foreach($guma as $a)
+	{
+		$idcom+=1;
+		$sql = "insert into committee values('$idcom','$a','$id','กรรมการ')";
+		//echo $sql."<br/>";
+		mysqli_query($connect, $sql);
+	}
+	$sql = "update project set id_statusproject='4' where id_project='$id'";
+	mysqli_query($connect, $sql);
+	mysqli_close($connect);
+?>

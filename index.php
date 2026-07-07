@@ -164,12 +164,25 @@ body {
     <td align="center" valign="top" bgcolor="#FFFFFF">
     <br/>
     <br/>
-    <a href="http://202.44.47.74/index.php/download-" target="_new" style="text-decoration:none; font-size:18px; color:#666; border: solid 1px #000; padding:10px">ดาวน์โหลดคู่มือจัดทำปริญญานิพนธ์</a>
+    <?
+	  include('connectdatabase.php');
+	  $manualpdf = "";
+	  $sqlmanual = "select pdf_news from news where topic_news like '%คู่มือจัดทำเล่มปริญญานิพนธ์%' order by date_news desc limit 1";
+	  $resultmanual = mysqli_query($connect, $sqlmanual);
+	  if($rsmanual = mysqli_fetch_array($resultmanual))
+	  {
+		  $manualpdf = $rsmanual[0];
+	  }
+	  if(!empty($manualpdf))
+	  {
+	?>
+    <a href="news/<?=htmlspecialchars($manualpdf, ENT_QUOTES)?>" target="_new" style="text-decoration:none; font-size:18px; color:#666; border: solid 1px #000; padding:10px">ดาวน์โหลดคู่มือจัดทำปริญญานิพนธ์</a>
+    <? } ?>
     <br/>
     <br/>
     <br/>
     <br/>
-                  <? include('connectdatabase.php'); 
+                  <?
 	  		  $sql2 = "select * from news order by date_news desc";
 			  $result2 = mysqli_query($connect, $sql2);
 			  	if(mysqli_num_rows($result2)!=0)

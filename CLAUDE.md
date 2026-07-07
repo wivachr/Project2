@@ -121,6 +121,19 @@ if(!isset($requiredField) || trim($requiredField)==="") { exit; }
 ```
 This has already been retrofitted onto ~21 handlers this session (see `ERROR_AUDIT_REPORT.md`) — but any handler not yet touched still has this gap.
 
+### "Transparent" PNG Assets May Not Actually Have Alpha
+Icon/logo files sourced from icon sites (filenames like `*_transparent.png`) sometimes bake a checkerboard preview pattern into the actual pixels instead of shipping real alpha transparency. Check the PNG's IHDR color type before trusting the filename — color type 6 = RGBA (real alpha), color type 2 = RGB (none):
+```python
+import struct
+with open(path, 'rb') as f:
+    data = f.read(33)
+    colortype = data[25]  # 6 = has alpha, 2 = flat RGB
+```
+If it's flat RGB, Pillow (bundled with the Python on this dev machine) can fix it: threshold pixel brightness and zero out alpha on light/checkerboard pixels, keeping the dark artwork opaque. Used for `image/logo_it.png` on the `index.php` login banner.
+
+### Static Content Linking to a Specific News Attachment
+`index.php`'s "ดาวน์โหลดคู่มือจัดทำปริญญานิพนธ์" button resolves its PDF at request time by querying `news` for `topic_news LIKE '%คู่มือจัดทำเล่มปริญญานิพนธ์%'` and using that row's `pdf_news`, instead of hardcoding a filename/path. This means re-uploading the manual through the officer's ข่าวประกาศ module (`news/news.php`) updates the login-page button automatically — no code change needed. Use this pattern (query by known `topic_news` text) whenever static/public-facing content needs to link to one specific news attachment.
+
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` academic year data folders, `*.sql`, `*.bak`, `*.log`
 - Never commit `connectdatabase.php` credential changes or DB dumps

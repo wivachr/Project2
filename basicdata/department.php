@@ -49,7 +49,6 @@ function add()
 	include('../connectdatabase.php');
 	$sql = "select id_department from department";
 	$result = mysqli_query($connect, $sql);
-	$mdfive = md5($password);
 	while($rs = mysqli_fetch_array($result))
 	{
 		?>

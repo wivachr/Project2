@@ -418,7 +418,7 @@ include('../connectdatabase.php');
             <select name="roomassex" id="roomassex">
           <option value="0">---เลือกห้องเรียน---</option>
                             <?
-							include('../../connectdatabase.php');
+							include('../connectdatabase.php');
 			  $sql = "select * from room";
 			  
 			  $result = mysqli_query($connect, $sql);

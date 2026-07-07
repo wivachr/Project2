@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 PHP 8.2 web application for university academic project management (senior/thesis projects).
 Stack: PHP 8.2, MySQL (MySQLi), jQuery (legacy), XAMPP local dev. No build step — plain PHP served directly.
+See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and fixes applied.
 
 ## Local Development
 - Web root: `C:\xampp\htdocs\` — access via `http://localhost/Project2/`
@@ -54,8 +55,8 @@ include('../change.php');
 - `project/` — core: submit/approve/assign committee/schedule exam/record results. `shows2–shows8.php` are list views for each exam workflow step.
 - `student/`, `teacher/`, `register/`, `race/` — CRUD modules for entities
 - `exam/` — edit/view exam schedule
-- `report/` — PDF generation (FPDF library in `report/`) and screen reports
-- `basicdata/` — lookup tables (faculty, title, type, room, etc.)
+- `report/` — PDF generation (FPDF library in `report/`) and screen reports. `report/ex.php` and `report/jadoo.php` are unused FPDF demo files, not part of the app — ignore.
+- `basicdata/` — lookup tables (faculty, title, type, room, etc.). `basicdata/branch.php` and its `add/del/edit` helpers are dead/orphaned — they reference `board`/`branch` DB tables that don't exist, and nothing links to them. Don't "fix" without first understanding what they were meant to become (see `ERROR_AUDIT_REPORT.md`).
 - `news/`, `user/`, `password/`, `year/`, `headofdepartment/` — small utility modules
 
 ### Exam Workflow (officer)

@@ -32,7 +32,6 @@ function add()
 	include('../connectdatabase.php');
 	$sql = "select id_curr from curriculum";
 	$result = mysqli_query($connect, $sql);
-	$mdfive = md5($password);
 	while($rs = mysqli_fetch_array($result))
 	{
 		?>

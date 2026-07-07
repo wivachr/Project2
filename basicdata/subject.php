@@ -41,7 +41,6 @@ function add()
 	include('../connectdatabase.php');
 	$sql = "select id_subject from subject";
 	$result = mysqli_query($connect, $sql);
-	$mdfive = md5($password);
 	while($rs = mysqli_fetch_array($result))
 	{
 		?>

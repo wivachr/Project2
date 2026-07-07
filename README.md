@@ -67,3 +67,4 @@ Project2/
 - ทุก `.load()` ต่อท้าย `?pop=Math.random()` เพื่อป้องกัน browser cache
 - ใช้ `json_encode()` ส่งค่า PHP เข้า JS onclick เสมอ
 - ลำดับลบข้อมูล (FK): `assignexam → committee → exam → manipulator → projecthistory → project`
+- ดูรายงานปัญหาที่ตรวจพบและแก้ไขทั้งหมดได้ที่ `ERROR_AUDIT_REPORT.md`

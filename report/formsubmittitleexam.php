@@ -115,6 +115,8 @@ body,td,th {
 			  $head = "";
 			  $master = "";
 			  $teacher = "";
+			  $subject = "";
+			  $credit = "";
 			  $sql = "select * from manipulator,student,title where student.id_title=title.id_title  AND manipulator.id_student=student.id_student AND id_project='".$rs[0]."' order by id_manipulator";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs2 = mysqli_fetch_array($result))
@@ -245,20 +247,20 @@ body,td,th {
       <td colspan="6" valign="top"><strong>นักศึกษาผู้ร่วมงาน</strong></td>
     </tr>
     <tr>
-      <td width="13%" valign="top"><strong>ชื่อ - สกุล</strong></td>
-      <td width="33%"><? if($student[1]==""){echo "-";}else{echo $student[1];}?></td>
-      <td width="15%"><strong>รหัสประจำตัว</strong></td>
-      <td width="11%"><? if($idstu[1]==""){echo "-";}else{echo $idstu[1];}?></td>
-      <td width="12%"><strong>โทรศัพท์</strong></td>
-      <td width="16%"><? if($tel[1]==""){echo "-";}else{echo $tel[1];}?></td>
+      <td width="13%" valign="top" nowrap="nowrap"><strong>ชื่อ - สกุล</strong></td>
+      <td width="33%"><? if(!isset($student[1])||$student[1]==""){echo "-";}else{echo $student[1];}?></td>
+      <td width="15%" nowrap="nowrap"><strong>รหัสประจำตัว</strong></td>
+      <td width="11%"><? if(!isset($idstu[1])||$idstu[1]==""){echo "-";}else{echo $idstu[1];}?></td>
+      <td width="12%" nowrap="nowrap"><strong>โทรศัพท์</strong></td>
+      <td width="16%"><? if(!isset($tel[1])||$tel[1]==""){echo "-";}else{echo $tel[1];}?></td>
     </tr>
     <tr>
-      <td valign="top"><strong>ชื่อ - สกุล</strong></td>
-      <td><? if($student[2]==""){echo "-";}else{echo $student[2];}?></td>
-      <td><strong>รหัสประจำตัว</strong></td>
-      <td><? if($idstu[2]==""){echo "-";}else{echo $idstu[2];}?></td>
-      <td><strong>โทรศัพท์</strong></td>
-      <td><? if($tel[2]==""){echo "-";}else{echo $tel[1];}?></td>
+      <td valign="top" nowrap="nowrap"><strong>ชื่อ - สกุล</strong></td>
+      <td><? if(!isset($student[2])||$student[2]==""){echo "-";}else{echo $student[2];}?></td>
+      <td nowrap="nowrap"><strong>รหัสประจำตัว</strong></td>
+      <td><? if(!isset($idstu[2])||$idstu[2]==""){echo "-";}else{echo $idstu[2];}?></td>
+      <td nowrap="nowrap"><strong>โทรศัพท์</strong></td>
+      <td><? if(!isset($tel[2])||$tel[2]==""){echo "-";}else{echo $tel[2];}?></td>
     </tr>
     <? for($i=3;$i<$num;$i++)
 	{

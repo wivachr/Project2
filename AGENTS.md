@@ -3,6 +3,7 @@
 ## Project Overview
 PHP web application for university academic project management (senior/thesis projects).
 Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
+See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and fixes applied.
 
 ## Local Development
 - Web root: `C:\xampp\htdocs\` — project must be symlinked or copied there to run
@@ -34,6 +35,7 @@ Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
 - File uploads (PDFs) use a hidden iframe + form targeting a script that echoes back `<script>window.parent.uploadok()</script>`; don't `mysqli_close($connect)` before that script's last query runs, or PHP 8.2 throws a fatal error and the callback never fires
 - Bulk `.xlsx` imports (`student/importingstudent.php`, `register/importingregister.php`) share `xlsxreader.php` — a zero-dependency parser built on `ZipArchive` + `SimpleXML`. Always match text values against existing lookup tables and skip unmatched/duplicate rows; never auto-create lookup rows
 - `subject.id_subject` / `registration.id_subject` / `project.id_subject` are `varchar(15)`, not numbers — codes carry meaningful leading zeros (e.g. `060243202`). Never `(int)` cast or do arithmetic on it
+- `basicdata/branch.php` (and its add/del/edit helpers) is dead/orphaned — references `board`/`branch` tables that don't exist in the DB, and nothing in the app links to it. Don't spend time "fixing" it without first reading `ERROR_AUDIT_REPORT.md`
 
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` folders (academic year data), `*.sql`, `*.bak`, `*.log`

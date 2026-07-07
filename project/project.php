@@ -641,6 +641,11 @@ if(mysqli_num_rows($result)!=0)
       <input type="button" id="btnsubmittitleexam" value="ยื่นสอบหัวข้อ" onclick="submittitleexam()"/>
       <? } ?>
       </div>
+      <div id="s2" style="margin-top:15px">
+      <? if($rs[10]=='2') { ?>
+      <input type="button" id="btnprinttitleexam" value="พิมพ์ใบยื่นสอบหัวข้อ" onClick="window.open('report/formsubmittitleexam.php', '_blank', '')"/>
+      <? } ?>
+      </div>
       <div id="s3" style="margin-top:15px">
       <? if($rs[10]=='6') { ?>
       <input type="button" id="btnsubmit100exam" value="ยื่นสอบร้อย%" onclick="submit100exam()"/>

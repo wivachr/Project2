@@ -111,6 +111,10 @@ body,td,th {
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {
+			  $gum = "";
+			  $head = "";
+			  $master = "";
+			  $teacher = "";
 			  $sql = "select * from manipulator,student,title where student.id_title=title.id_title  AND manipulator.id_student=student.id_student AND id_project='".$rs[0]."' order by id_manipulator";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs2 = mysqli_fetch_array($result))

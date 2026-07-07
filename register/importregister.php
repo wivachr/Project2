@@ -10,14 +10,14 @@ function subc()
 	var form1 = document.forms['form1'];
 	form1.submit();
 }
-function importok()
+function importok(summary)
 {
-	document.getElementById("showup").innerHTML = "นำเข้าข้อมูลเสร็จเรียบร้อย";
+	document.getElementById("showup").innerHTML = summary.split("|").join("<br/>");
 	document.getElementById("fileField").value = "";
 }
 function importfalse()
 {
-	document.getElementById("showup").innerHTML = "กรุณาเลือกไฟล์ประเภท txt";
+	document.getElementById("showup").innerHTML = "กรุณาเลือกไฟล์ประเภท Excel (.xlsx)";
 	document.getElementById("fileField").value = "";
 }
 </script><title></title>
@@ -31,14 +31,18 @@ function importfalse()
 <form action="register/importingregister.php" method="post" enctype="multipart/form-data" name="form1" target="uploadtarget">
   <table border="0" align="center">
   <tr>
-    <td align="right">ข้อมูลการลงทะเบียน(.txt) :</td>
+    <td align="right">ข้อมูลการลงทะเบียน(.xlsx) :</td>
     <td align="right"><label for="fileField"></label>
-    <input type="file" name="fileField" id="fileField"/></td>
+    <input type="file" name="fileField" id="fileField" accept=".xlsx"/></td>
   </tr>
       </table>
 <br/>
-<input type="submit" name="button" id="button" value="นำเข้าข้อมูลการลงทะเบียน" />
+<input type="submit" name="button" id="button" value="นำเข้าข้อมูลการลงทะเบียน" onclick="subc(); return false;" />
 </form>
 <span id="showup"></span>
+<p style="color:#888; font-size:11px;">
+คอลัมน์ที่ต้องมีในไฟล์ (แถวแรกเป็นหัวตาราง): เลขประจำตัวนักศึกษา, ปีการศึกษา, ภาคเรียน, รหัสวิชา, ชื่อวิชา, ตอนเรียน<br/>
+ระบบจะตรวจสอบว่ารหัสนักศึกษาและรหัสวิชามีอยู่ในระบบจริง และข้ามรายการที่ลงทะเบียนซ้ำ พร้อมแจ้งสรุปผล
+</p>
 </body>
 </html>

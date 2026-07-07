@@ -19,9 +19,9 @@
   if(!isset($start)){ $start = 0; }
   if(!isset($key)){ $key = ''; }
 $limit = '20'; // แสดงผลหน้าละกี่หัวข้อ
-$sql = mysqli_query($connect, "select * from registration,student,subject where subject.id_subject=registration.id_subject AND registration.id_student=student.id_student AND(year_registration LIKE '%$key%' OR semester_registration LIKE '%$key%' OR subject.id_subject LIKE '%$key%' OR section LIKE '%$key%' OR name_subject LIKE '%$key%' OR name_student LIKE '%$key%' OR sname_student LIKE '%$key%' OR student.id_student LIKE '%$key%') ORDER BY student.id_student DESC");
+$sql = mysqli_query($connect, "select * from registration,student,subject where subject.id_subject=registration.id_subject AND registration.id_student=student.id_student AND(year_registration LIKE '%$key%' OR semester_registration LIKE '%$key%' OR subject.id_subject LIKE '%$key%' OR section LIKE '%$key%' OR name_subject LIKE '%$key%' OR name_student LIKE '%$key%' OR sname_student LIKE '%$key%' OR student.id_student LIKE '%$key%') ORDER BY year_registration DESC, semester_registration DESC, student.id_student DESC");
 $total = mysqli_num_rows($sql);
-$Query = mysqli_query($connect, "select * from registration,student,subject where subject.id_subject=registration.id_subject AND registration.id_student=student.id_student AND(year_registration LIKE '%$key%' OR semester_registration LIKE '%$key%' OR subject.id_subject LIKE '%$key%' OR section LIKE '%$key%' OR name_subject LIKE '%$key%' OR name_student LIKE '%$key%' OR sname_student LIKE '%$key%' OR student.id_student LIKE '%$key%') ORDER BY student.id_student DESC LIMIT $start,$limit"); //คิวรี่คำสั่ง
+$Query = mysqli_query($connect, "select * from registration,student,subject where subject.id_subject=registration.id_subject AND registration.id_student=student.id_student AND(year_registration LIKE '%$key%' OR semester_registration LIKE '%$key%' OR subject.id_subject LIKE '%$key%' OR section LIKE '%$key%' OR name_subject LIKE '%$key%' OR name_student LIKE '%$key%' OR sname_student LIKE '%$key%' OR student.id_student LIKE '%$key%') ORDER BY year_registration DESC, semester_registration DESC, student.id_student DESC LIMIT $start,$limit"); //คิวรี่คำสั่ง
 $totalp = mysqli_num_rows($Query); // หาจำนวน record ที่เรียกออกมา
 while($rs = mysqli_fetch_array($Query))
 {

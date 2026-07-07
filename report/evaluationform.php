@@ -107,6 +107,14 @@ body,td,th {
 	  $num = 0;
 	  $nnnum = 0;
 	  $coad="";
+	  $scoad="";
+	  $teacher="";
+	  $steacher="";
+	  $master="";
+	  $smaster="";
+	  $head="";
+	  $subject="";
+	  $credit="";
 	  		  $sql = "select * from project,statusproject where project.id_statusproject=statusproject.id_statusproject AND project.id_project='$id'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
@@ -240,7 +248,7 @@ body,td,th {
       <tr>
       <td width="26%" align="left"><strong>อาจารย์ที่ปรึกษาร่วม</strong></td>
       <td width="28%" align="left"><? if($coad==""){echo "-";}else{echo $coad;}?></td>
-      <td width="46%" align="left"><?=$scoad?></td>
+      <td width="46%" align="left"><? if($scoad==""){echo "-";}else{echo $scoad;}?></td>
     </tr>
   </table>
   <table width="100%" border="0">
@@ -307,7 +315,7 @@ body,td,th {
       <td height="35" align="center" valign="bottom">................................................................</td>
     </tr>
     <tr>
-      <td align="center"><?=$gum[0]." ".$sgum[0]?></td>
+      <td align="center"><?=($gum[0]??"")." ".($sgum[0]??"")?></td>
     </tr>
     <tr>
       <td align="center">กรรมการ</td>
@@ -316,7 +324,7 @@ body,td,th {
       <td height="35" align="center" valign="bottom">................................................................</td>
     </tr>
     <tr>
-      <td align="center"><?=$gum[1]." ".$sgum[1]?></td>
+      <td align="center"><?=($gum[1]??"")." ".($sgum[1]??"")?></td>
     </tr>
     <tr>
       <td align="center">กรรมการ</td>

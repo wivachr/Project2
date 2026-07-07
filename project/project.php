@@ -333,6 +333,7 @@ table.info-table tr:nth-child(even) { background: #f7f7f7; }
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {
+			  $teacher = "";
 			   $sql = "select * from assignexam,room,exam where assignexam.id_room=room.id_room AND assignexam.id_exam=exam.id_exam AND id_statusproject ='21' AND id_project='".$rs[0]."'";
 			   $result = mysqli_query($connect, $sql);
 			   while($rs2 = mysqli_fetch_array($result))
@@ -389,6 +390,32 @@ table.info-table tr:nth-child(even) { background: #f7f7f7; }
     <tr>
       <th>รหัสโครงงาน :</th>
       <td><?=$rs[0]?></td>
+    </tr>
+    <tr>
+      <th>ประเภทโครงงาน :</th>
+      <td><strong><?
+      if($rs[14]=='year')
+      {
+      	echo "โปรเจคปี";
+      	echo empty($rs[15]) ? " (โปรเจค 1)" : " (โปรเจค 2)";
+      }
+      else
+      {
+      	echo "โปรเจคเทอม";
+      }
+      ?></strong>
+      <?
+      $has2nd = false;
+      if($rs[14]=='year'&&empty($rs[15]))
+      {
+      	$sql = "select id_project from project where parent_project_id='".$rs[0]."' limit 1";
+      	$result = mysqli_query($connect, $sql);
+      	$has2nd = mysqli_num_rows($result)>0;
+      }
+      if($rs[14]=='year'&&empty($rs[15])&&!$has2nd&&in_array($rs[10], array(6,7,8,9,10,11,12,13,14,15,16,19,20,21,23,24))) { ?>
+      &nbsp;<input type="button" value="ลงทะเบียนโปรเจค 2" onclick="registerproject2(<?=$rs[0]?>)"/>
+      <? } ?>
+      </td>
     </tr>
     <tr>
       <th>ชื่อโครงงาน :</th>
@@ -612,6 +639,11 @@ if(mysqli_num_rows($result)!=0)
       <div id="s1" style="margin-top:15px">
       <? if($rs[9]!=""&&$rs[10]=='1') { ?>
       <input type="button" id="btnsubmittitleexam" value="ยื่นสอบหัวข้อ" onclick="submittitleexam()"/>
+      <? } ?>
+      </div>
+      <div id="s3" style="margin-top:15px">
+      <? if($rs[10]=='6') { ?>
+      <input type="button" id="btnsubmit100exam" value="ยื่นสอบร้อย%" onclick="submit100exam()"/>
       <? } ?>
       </div>
       </td>

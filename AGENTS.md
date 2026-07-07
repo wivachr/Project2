@@ -9,6 +9,7 @@ Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
 - Local URL: `http://localhost/` (officer.php, student.php, teacher.php, etc.)
 - DB: MySQL via XAMPP, database name check via phpMyAdmin
 - No build step — plain PHP files served directly
+- The `zip` PHP extension must be enabled in `php.ini` (then restart Apache) for `.xlsx` import features (`xlsxreader.php`)
 
 ## Repository
 - GitHub: https://github.com/wivachr/Project2.git
@@ -31,6 +32,8 @@ Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
 - SQL deletions must go child → parent (assignexam → committee → exam → manipulator → projecthistory → project)
 - Relative paths inside a fragment (e.g. `action="upload.php"` in `project/formeditproject.php`) resolve against the **shell's** URL, not the fragment's own folder — always write the full path from site root (e.g. `project/upload.php`), or the request 404s
 - File uploads (PDFs) use a hidden iframe + form targeting a script that echoes back `<script>window.parent.uploadok()</script>`; don't `mysqli_close($connect)` before that script's last query runs, or PHP 8.2 throws a fatal error and the callback never fires
+- Bulk `.xlsx` imports (`student/importingstudent.php`, `register/importingregister.php`) share `xlsxreader.php` — a zero-dependency parser built on `ZipArchive` + `SimpleXML`. Always match text values against existing lookup tables and skip unmatched/duplicate rows; never auto-create lookup rows
+- `subject.id_subject` / `registration.id_subject` / `project.id_subject` are `varchar(15)`, not numbers — codes carry meaningful leading zeros (e.g. `060243202`). Never `(int)` cast or do arithmetic on it
 
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` folders (academic year data), `*.sql`, `*.bak`, `*.log`

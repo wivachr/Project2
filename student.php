@@ -120,6 +120,49 @@ if (answer)
 		req.send(null);
 }
 	 }
+	 function registerproject2(idproject)
+	 {
+		 var answer = confirm  ("ยืนยันการลงทะเบียนใช่หรือไม่ ?")
+if (answer)
+{
+		var  req;
+		if(window.ActiveXObject)
+		{
+			req=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		else if (window.XMLHttpRequest)
+		{
+			req=new XMLHttpRequest();
+		}
+		else
+		{
+			alert("Browser not support");
+			return false;
+		}
+		var str = Math.random();
+		var  qstr ="project/registerproject2.php?pop="+str;
+		qstr += "&&idproject="+encodeURIComponent(idproject);
+		req.onreadystatechange = function()
+		{
+			if(req.readyState==4)
+			{
+				var parts = req.responseText.split("|");
+				if(parts[0]=="OK")
+				{
+					alert("ลงทะเบียนโปรเจค 2 เรียบร้อยแล้ว\nรหัสโครงงานใหม่คือ "+parts[1]+"\nใช้รหัสผ่านเดิมในการเข้าสู่ระบบด้วยรหัสโครงงานนี้");
+					var popsrt = Math.random();
+					$("#showmanage").load("project/project.php?pop="+popsrt);
+				}
+				else
+				{
+					alert(parts[1]);
+				}
+			}
+		}
+		req.open("GET",qstr,true);
+		req.send(null);
+}
+	 }
  	 function submit60exam()
 	 {
 		 var answer = confirm  ("ยืนยันการยื่นสอบหกสิบ ?")

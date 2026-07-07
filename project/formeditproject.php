@@ -1036,6 +1036,9 @@ function saveco()
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {
+			  $coad = "";
+			  $master = "";
+			  $teacher = "";
 
 			  $sql = "select * from manipulator,student,title where title.id_title = student.id_title AND manipulator.id_student=student.id_student AND id_project='".$rs[0]."' order by id_manipulator";
 			  $result = mysqli_query($connect, $sql);

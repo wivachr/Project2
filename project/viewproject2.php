@@ -18,6 +18,10 @@ body,td,th {
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {
+			  $coad = "";
+			  $gum = "";
+			  $master = "";
+			  $teacher = "";
 			  $sql = "select * from manipulator,student,title where title.id_title = student.id_title AND manipulator.id_student=student.id_student AND id_project='".$rs[0]."' order by id_manipulator";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs2 = mysqli_fetch_array($result))
@@ -63,6 +67,22 @@ body,td,th {
       <td width="195" align="right" nowrap="nowrap" scope="col">สถานะโครงงาน :</td>
       <td width="487" align="left">
       <?=$rs[17]?>
+      </td>
+    </tr>
+    <tr>
+      <td align="right" nowrap="nowrap" scope="col">ประเภทโครงงาน :</td>
+      <td align="left">
+      <?
+      if($rs[14]=='year')
+      {
+      	echo "โปรเจคปี";
+      	echo empty($rs[15]) ? " (โปรเจค 1)" : " (โปรเจค 2)";
+      }
+      else
+      {
+      	echo "โปรเจคเทอม";
+      }
+      ?>
       </td>
     </tr>
     <tr>

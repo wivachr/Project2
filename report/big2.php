@@ -8,8 +8,12 @@
 
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 <? 
-include('../connectdatabase.php'); 
+include('../connectdatabase.php');
 $nnnum = 0;
+$master = "";
+$smaster = "";
+$coad = "";
+$scoad = "";
 	  		  $sql = "select * from project,statusproject where project.id_statusproject=statusproject.id_statusproject AND  project.id_project='$id'";
 			  			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))

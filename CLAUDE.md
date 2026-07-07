@@ -11,6 +11,7 @@ Stack: PHP 8.2, MySQL (MySQLi), jQuery (legacy), XAMPP local dev. No build step 
 - DB: MySQL via XAMPP, database name: `projectinformationsystem`
 - Credentials in `connectdatabase.php`: root / (no password)
 - No build step, no package manager, no test suite
+- The `zip` PHP extension must be enabled (`extension=zip` in `php.ini`, then restart Apache) — required by `xlsxreader.php` for parsing `.xlsx` uploads via `ZipArchive`
 
 ## Architecture
 
@@ -105,6 +106,12 @@ Multipart PDF uploads can't use the AJAX-GET pattern used elsewhere, so they go 
 <form action="module/upload.php?id=<?=$id?>" method="post" enctype="multipart/form-data" target="uploadtarget" onsubmit="return clickupload();">
 ```
 The target script echoes `<script>window.parent.uploadok()/uploadfalse()</script>` back into the iframe, handled by globally-scoped `uploadok()`/`uploadfalse()` functions in the shell or fragment. Don't call `mysqli_close($connect)` before the final query in these scripts — reusing a closed connection throws a fatal error on PHP 8.2 and silently kills the callback before it's sent.
+
+### Excel (.xlsx) Bulk Import
+Bulk-import pages (`student/importingstudent.php`, `register/importingregister.php`) accept `.xlsx` and parse it with `xlsxreader.php`'s `readXlsxRows($path)` — a dependency-free reader built on PHP's built-in `ZipArchive` + `SimpleXML` (an `.xlsx` is a zip of XML: `xl/sharedStrings.xml` + `xl/worksheets/sheet1.xml`). No Composer package needed, but the `zip` extension must be enabled (see Local Development above). Each importer looks up text values (title/faculty/department/etc.) against existing lookup tables and skips rows that don't match or that already exist — it never silently invents new lookup rows or overwrites duplicates.
+
+### `id_subject` is a VARCHAR, Not a Number
+`subject.id_subject`, `registration.id_subject`, and `project.id_subject` are `varchar(15)` — subject codes carry meaningful leading zeros (e.g. `060243202`). Never cast this to `(int)` or use it in arithmetic; always treat it as an opaque string (escape with `mysqli_real_escape_string`, compare with `=`). A prior bug in `project/registerproject2.php` cast it to `(int)` and silently stripped the leading zero.
 
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` academic year data folders, `*.sql`, `*.bak`, `*.log`

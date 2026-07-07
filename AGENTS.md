@@ -23,6 +23,7 @@ See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and
 - `year/` — change academic year/semester
 - `connectdatabase.php` — DB connection (included once per fragment; don't double-include)
 - `change.php` — session/auth check included at top of every page
+- `index.php`, `admin.php`, `officer.php`, `teacher.php`, `student.php` each duplicate the same outer banner/footer `<table>` skeleton (no shared include) — site-wide branding (logo, copyright, footer text) must be edited in all five files
 
 ## Key Patterns
 - Pages loaded via jQuery `.load()` are HTML fragments — `<html>/<head>/<body>` tags are stripped, only body content renders

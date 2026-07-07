@@ -605,7 +605,7 @@ if((!(empty($_SESSION['fullname'])))&&$_SESSION['right']==4)
 ?>
 <table width="1020" height="768" border="0" align="center"cellpadding="0" cellspacing="0">
   <tr>
-    <td height="150" colspan="2" background="image/head.gif">&nbsp;</td>
+    <td height="150" colspan="2" background="image/head.gif" valign="middle"><img src="image/logo_it.png" width="200" height="200" align="left" style="margin-left:15px" /></td>
   </tr>
   <tr height="20">
     <td colspan="2" align="right" bgcolor="#000000"><span style="color:#FFF">
@@ -640,7 +640,7 @@ if((!(empty($_SESSION['fullname'])))&&$_SESSION['right']==4)
     <div id="result"></div><br/></td>
   </tr>
   <tr height="60">
-    <td colspan="2" valign="top" bgcolor="#000000">&nbsp;</td>
+    <td colspan="2" align="center" valign="middle" bgcolor="#000000"><span style="color:#FFF">สงวนลิขสิทธิ์ ภาควิชาเทคโนโลยีสารสนเทศ คณะเทคโนโลยีและการจัดการอุตสาหกรรม มจพ.ปราจีนบุรี<br />ปรับปรุงล่าสุด: 7 กรกฎาคม 2569</span></td>
   </tr>
 </table>
 <? }?>

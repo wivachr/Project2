@@ -28,6 +28,8 @@ All navigation is single-page via jQuery `.load()` — the shell pages hold the 
 | `student.php` | Student portal shell | right=4 |
 | `admin.php` | Admin portal shell | right=1 |
 
+All five of these shells (`index.php` + the four portals) share an identical outer `<table>` skeleton: a `height="151"/"150"` banner row with `background="image/head.gif"`, then a black `bgcolor="#000000"` footer row at the bottom. Site-wide branding (logo, copyright, footer text) lives in both of those rows and must be edited in **all five files** to stay consistent — there's no shared header/footer include. Currently: the banner row holds `<img src="image/logo_it.png" width="200" height="200" align="left">`, and the footer row holds the copyright line + "ปรับปรุงล่าสุด" date.
+
 ### Authentication Flow
 1. `index.php` loads `login.php` fragment via `$(#login).load()`
 2. Login form submits via raw XHR to `loging.php`, which sets `$_SESSION['right']`, `$_SESSION['iduser']`, `$_SESSION['fullname']`, `$_SESSION['idproject']`

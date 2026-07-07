@@ -22,9 +22,16 @@
   if(!isset($start)){ $start = 0; }
   if(!isset($key)){ $key = ''; }
 $limit = '10'; // แสดงผลหน้าละกี่หัวข้อ
-$sql = mysqli_query($connect, "select * from teacher,title,academictitle,faculty,department,division where teacher.id_academictitle= academictitle.id_academictitle AND teacher.id_title=title.id_title and teacher.id_faculty=faculty.id_faculty and teacher.id_department=department.id_department and teacher.id_division=division.id_division  AND(name_title LIKE '%$key%' OR name_teacher LIKE '%$key%' OR sname_teacher LIKE '%$key%' OR initials_teacher LIKE '%$key%' OR initials_division LIKE '%$key%' OR initials_department LIKE '%$key%' OR initials_faculty LIKE '%$key%' OR tel_teacher LIKE '%$key%')");
+$joinsql = "from teacher
+left join title on teacher.id_title=title.id_title
+left join academictitle on teacher.id_academictitle=academictitle.id_academictitle
+left join faculty on teacher.id_faculty=faculty.id_faculty
+left join department on teacher.id_department=department.id_department
+left join division on teacher.id_division=division.id_division
+where (name_title LIKE '%$key%' OR name_teacher LIKE '%$key%' OR sname_teacher LIKE '%$key%' OR initials_teacher LIKE '%$key%' OR initials_division LIKE '%$key%' OR initials_department LIKE '%$key%' OR initials_faculty LIKE '%$key%' OR tel_teacher LIKE '%$key%')";
+$sql = mysqli_query($connect, "select * $joinsql");
 $total = mysqli_num_rows($sql);
-$Query = mysqli_query($connect, "select * from teacher,title,academictitle,faculty,department,division where teacher.id_academictitle= academictitle.id_academictitle AND teacher.id_title=title.id_title and teacher.id_faculty=faculty.id_faculty and teacher.id_department=department.id_department and teacher.id_division=division.id_division  AND(name_title LIKE '%$key%' OR name_teacher LIKE '%$key%' OR sname_teacher LIKE '%$key%' OR initials_teacher LIKE '%$key%' OR initials_division LIKE '%$key%' OR initials_department LIKE '%$key%' OR initials_faculty LIKE '%$key%' OR tel_teacher LIKE '%$key%') ORDER BY teacher.id_teacher desc LIMIT $start,$limit"); //คิวรี่คำสั่ง
+$Query = mysqli_query($connect, "select * $joinsql ORDER BY teacher.id_teacher desc LIMIT $start,$limit"); //คิวรี่คำสั่ง
 $totalp = mysqli_num_rows($Query); // หาจำนวน record ที่เรียกออกมา
 while($rs = mysqli_fetch_array($Query))
 {
@@ -45,7 +52,7 @@ $result4 = mysqli_query($connect, $sql);
 <td align="left"><?=$rs[19]?></td>
 <td align="left"><?=$rs[22]?></td>
 <td align="left"><?=$rs[26]?></td>
-<td align="left"><?=$rs[9]?></td>
+<td align="center"><?=$rs[9]?></td>
 <td align="left"><?=$rs[10]?></td>
 <td><? if(mysqli_num_rows($result2)==0&&mysqli_num_rows($result3)==0&&mysqli_num_rows($result4)==0){?><a href="javascript:void(0);" onClick="del(<?=json_encode((int)$rs[0]);?>,<?=htmlspecialchars(json_encode((string)$rs[5]),ENT_COMPAT);?>)">ลบ</a><? }else{echo "ลบ";}?>/<a href="javascript:void(0);" onClick="showedit('<?=htmlspecialchars($rs[0],ENT_QUOTES)?>','<?=htmlspecialchars($rs[1],ENT_QUOTES)?>','<?=htmlspecialchars($rs[2],ENT_QUOTES)?>','<?=htmlspecialchars($rs[3],ENT_QUOTES)?>','<?=htmlspecialchars($rs[4],ENT_QUOTES)?>','<?=htmlspecialchars($rs[5],ENT_QUOTES)?>','<?=htmlspecialchars($rs[6],ENT_QUOTES)?>','<?=htmlspecialchars($rs[7],ENT_QUOTES)?>','<?=htmlspecialchars($rs[8],ENT_QUOTES)?>','<?=htmlspecialchars($rs[9],ENT_QUOTES)?>','<?=htmlspecialchars($rs[10],ENT_QUOTES)?>')">แก้ไข</a></td>
 </tr>

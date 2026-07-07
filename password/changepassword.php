@@ -4,7 +4,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 var hexcase = 0;   /* hex output format. 0 - lowercase; 1 - uppercase        */
 var b64pad  = "";  /* base-64 pad character. "=" for strict RFC compliance   */

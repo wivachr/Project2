@@ -272,6 +272,7 @@ document.getElementById('upmsg').style.color="";
 document.getElementById('btnUpload').value = "อัพโหลด ทก.01";
 document.getElementById('btnUpload').disabled = false;
 document.getElementById('frmUpload').reset() ;
+			alert('อัพโหลดไฟล์ ทก.01 สำเร็จ');
 			var popsrt = Math.random();
 			$("#showmanage").load("project/project.php?pop="+popsrt);
 return true ;

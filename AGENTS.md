@@ -29,6 +29,8 @@ Stack: PHP 8.2, MySQL (MySQLi), jQuery, XAMPP local dev.
 - String parameters in JS `onclick` handlers must be quoted via `json_encode()` — bare PHP variables become JS identifiers
 - Use `($_GET['page'] ?? null)` to avoid undefined index warnings
 - SQL deletions must go child → parent (assignexam → committee → exam → manipulator → projecthistory → project)
+- Relative paths inside a fragment (e.g. `action="upload.php"` in `project/formeditproject.php`) resolve against the **shell's** URL, not the fragment's own folder — always write the full path from site root (e.g. `project/upload.php`), or the request 404s
+- File uploads (PDFs) use a hidden iframe + form targeting a script that echoes back `<script>window.parent.uploadok()</script>`; don't `mysqli_close($connect)` before that script's last query runs, or PHP 8.2 throws a fatal error and the callback never fires
 
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` folders (academic year data), `*.sql`, `*.bak`, `*.log`

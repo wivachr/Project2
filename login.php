@@ -56,8 +56,7 @@
         <td colspan="2" align="center" bgcolor="#CCCCCC"><input type="submit" name="button" id="button" value="เข้าสู่ระบบ" onclick="login()"/></td>
       </tr>
       <tr bgcolor="#999999">
-        <td colspan="2" align="center" bgcolor="#CCCCCC"><a href="javascript:void(0);" onClick="window.open('regis/registerproject.php', 'new', 'menubar=no, toolbar=no, status=no, scrollbars=no, resizable=no, width=550, height=550');">ลงทะเบียนเข้าใช้งานระบบ<br />
-        </a><a href="javascript:void(0);" onClick="window.open('regis/registerprojectyear.php', 'new', 'menubar=no, toolbar=no, status=no, scrollbars=no, resizable=no, width=550, height=350');">ลงทะเบียนโครงงานพิเศษต่อเนื่อง</a></td>
+        <td colspan="2" align="center" bgcolor="#CCCCCC"><a href="javascript:void(0);" onClick="window.open('regis/registerproject.php', 'new', 'menubar=no, toolbar=no, status=no, scrollbars=yes, resizable=yes, width=650, height=620');">ลงทะเบียนโครงงานพิเศษ</a></td>
     </tr>
     <tr  height="10" bgcolor="#CCCCCC"><td colspan="2"></td></tr>
     </table>

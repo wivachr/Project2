@@ -15,7 +15,6 @@ include('../connectdatabase.php');
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="_js/datetimepicker.js"></script>
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	<? include('../connectdatabase.php'); 

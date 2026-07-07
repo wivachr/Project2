@@ -1,6 +1,10 @@
 # Academic year/semester folders (e.g. 2553-1, 2568-3)
 25[0-9][0-9]-*/
 
+# User-uploaded news PDF attachments
+news/uploads/*
+!news/uploads/index.html
+
 # Database backup
 *.sql
 *.bak

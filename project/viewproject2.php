@@ -62,7 +62,7 @@ body,td,th {
       <tr>
       <td width="195" align="right" nowrap="nowrap" scope="col">สถานะโครงงาน :</td>
       <td width="487" align="left">
-      <?=$rs[15]?>
+      <?=$rs[17]?>
       </td>
     </tr>
     <tr>

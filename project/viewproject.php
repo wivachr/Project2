@@ -47,6 +47,7 @@ body,td,th {
 			  {
 				  $gum = $rs3[18]." ".$rs3[7]." ".$rs3[8];
 			  }
+			  $coad = '';
 			  $sql = "select * from coadvisor,title where title.id_title = coadvisor.id_title AND id_project='".$rs[0]."'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs4 = mysqli_fetch_array($result))
@@ -62,7 +63,7 @@ body,td,th {
       <tr>
       <td width="195" align="right" nowrap="nowrap" scope="col">สถานะโครงงาน :</td>
       <td width="487" align="left">
-      <?=$rs[15]?>
+      <?=$rs[17]?>
       </td>
     </tr>
     <tr>

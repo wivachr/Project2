@@ -185,10 +185,11 @@ body {
 			  while($rs = mysqli_fetch_array($result))
 			  {
 				  $date2 = explode("-", $rs[4]);
+			  $pdflink = !empty($rs[5]) ? " <a href='news/".htmlspecialchars($rs[5],ENT_QUOTES)."' target='_blank'>[PDF]</a>" : "";
 			  if($rs[0]%2==1)
-              echo "<tr bgcolor='#CCCCCC' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /> <a href='news/viewnews.php?id=$rs[0]' target='_blank'>$rs[1]</a></td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
+              echo "<tr bgcolor='#CCCCCC' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /> <a href='news/viewnews.php?id=$rs[0]' target='_blank'>$rs[1]</a>$pdflink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
 			  else
-              echo "<tr bgcolor='#E9E9E9' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /><a href='news/viewnews.php?id=$rs[0]' target='_blank'> $rs[1]</a></td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
+              echo "<tr bgcolor='#E9E9E9' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /><a href='news/viewnews.php?id=$rs[0]' target='_blank'> $rs[1]</a>$pdflink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
 			  }
 			  ?>
       </table>
@@ -197,16 +198,6 @@ body {
       <br/>
       <? } ?>
 
-      <table width="379" border="0" style="border:dotted">
-        <tr>
-          <td align="center" bgcolor="#FFFFFF"><h2>คำแนะนำ</h2></td>
-        </tr>
-        <tr>
-          <td bgcolor="#FFFFFF"><p>ในการแสดงผลที่ถูกต้องควรใช้ Internet Explorer 8 และฟร้อน Sarabun</p>
-          <p>สามารถดาวโหลด Internet Explorer 8 <a href="download/IE8-WindowsXP-x86-ENU.exe">ที่นี่</a></p>
-          <p>สามารถดาวโหลด ฟร้อนได้ <a href="download/fontTH.rar">ที่นี่</a></p></td>
-        </tr>
-      </table>
     <p>&nbsp;</p></td>
   </tr>
   <tr>

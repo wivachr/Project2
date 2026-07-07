@@ -1,5 +1,5 @@
 <? include('../../change.php'); ?>
-<table width="41%" border="0" cellpadding="0" cellspacing="1">
+<table width="70%" border="0" cellpadding="0" cellspacing="1">
     <tr>
       <td width="79%" align="center" bgcolor="#CCCCCC">ห้องเรียน</td>
       <td width="21%" bgcolor="#CCCCCC"></td>

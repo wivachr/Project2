@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 var idnews;
 	$(document).ready(function() {
@@ -58,10 +57,15 @@ function add()
 		if(req.readyState==4)
 		{
 			var popsrt = Math.random();
-			$("#listnews").load("news/shownews.php?pop="+popsrt);
-   			var resultarea= document.getElementById('result');
-   			resultarea.innerHTML = req.responseText;
+			idnews = req.responseText;
+			var resultarea= document.getElementById('result');
+			resultarea.innerHTML = "";
 			cleardata();
+			if ( document.getElementById('fileupload').value.length > 0 )
+			{
+				startUpload();
+			}
+			$("#listnews").load("news/shownews.php?pop="+popsrt);
 		}
 		else
 		{
@@ -71,6 +75,53 @@ function add()
 	}
 	req.open("GET",qstr,true);
 	req.send(null);
+}
+
+function startUpload()
+{
+	document.getElementById('frmUpload').action = "news/uploadnews.php?idnews="+idnews;
+	document.getElementById('upmsg').style.color="";
+	document.getElementById('upmsg').innerHTML = "";
+	document.getElementById('btnUpload').disabled = true ;
+	document.getElementById('frmUpload').submit();
+}
+function clickupload()
+{
+	if ( document.getElementById('fileupload').value.length == 0 )
+	{
+		alert( 'ระบุ File ที่จะ Upload' ) ;
+		return false ;
+	}
+	if(!idnews)
+	{
+		alert( 'กรุณาเพิ่มหรือเลือกข่าวสารก่อนอัพโหลดไฟล์' ) ;
+		return false ;
+	}
+	document.getElementById('frmUpload').action = "news/uploadnews.php?idnews="+idnews;
+	document.getElementById('upmsg').style.color="";
+	document.getElementById('upmsg').innerHTML = "";
+	document.getElementById('btnUpload').disabled = true ;
+	return true ;
+}
+function uploadfalse()
+{
+	document.getElementById('fileupload').value ="";
+	document.getElementById('upmsg').style.color="#FF6666";
+	document.getElementById('upmsg').innerHTML = 'กรุณาอัพโหลดไฟล์ประเภท pdf' ;
+	document.getElementById('btnUpload').disabled = false;
+	document.getElementById('frmUpload').reset() ;
+	return true ;
+}
+function uploadok()
+{
+	document.getElementById('fileupload').value ="";
+	document.getElementById('upmsg').style.color="green";
+	document.getElementById('upmsg').innerHTML = 'อัพโหลดไฟล์สำเร็จ' ;
+	document.getElementById('btnUpload').disabled = false;
+	document.getElementById('frmUpload').reset() ;
+	var popsrt = Math.random();
+	$("#listnews").load("news/shownews.php?pop="+popsrt);
+	return true ;
 }
 
 function cancel()
@@ -178,13 +229,17 @@ function edit()
 		if(req.readyState==4)
 		{
 			var popsrt = Math.random();
-			$("#listnews").load("news/shownews.php?pop="+popsrt);
-   			var resultarea= document.getElementById('result');
-   			resultarea.innerHTML = req.responseText;
+			var resultarea= document.getElementById('result');
+			resultarea.innerHTML = req.responseText;
 			cleardata();
 			$("#editnews").hide();
 			$("#cancelnews").hide();
 			$("#addnews").show();
+			if ( document.getElementById('fileupload').value.length > 0 )
+			{
+				startUpload();
+			}
+			$("#listnews").load("news/shownews.php?pop="+popsrt);
 		}
 		else
 		{
@@ -215,6 +270,17 @@ function cleardata()
               <td align="right" valign="top">รายละเอียดข่าวสาร :</td>
               <td align="left"><label for="detailnews"></label>
               <textarea name="detailnews" id="detailnews" cols="45" rows="5"></textarea></td>
+            </tr>
+            <tr>
+              <td align="right" valign="top">ไฟล์ PDF ประกอบข่าวสาร :</td>
+              <td align="left">
+                <iframe id="uploadtarget" name="uploadtarget" src="" style="width:0px;height:0px;border:0"></iframe>
+                <form id="frmUpload" action="" method="post" enctype="multipart/form-data" onsubmit="return clickupload();" target="uploadtarget">
+                <input id="fileupload" name="fileupload" type="file" accept="application/pdf">
+                <input type="submit" id="btnUpload" name="btnUpload" value="อัพโหลด PDF" style="display:none"/>
+                </form>
+                <span id="upmsg"></span>
+              </td>
             </tr>
             <tr>
               <td colspan="2" align="center"><input type="button" name="editnews" id="editnews" value="บันทึก" onclick="edit()"/>

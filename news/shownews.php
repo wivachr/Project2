@@ -4,6 +4,7 @@
       <td  align="center" bgcolor="#CCCCCC">หัวข้อข่าวสาร</td>
       <td  align="center" bgcolor="#CCCCCC">วันที่เขียน</td>
       <td  align="center" bgcolor="#CCCCCC">ผู้เขียน</td>
+      <td  align="center" bgcolor="#CCCCCC">PDF</td>
       <td  align="center" bgcolor="#CCCCCC"></td>
     </tr>
  <? include('../connectdatabase.php');
@@ -16,7 +17,8 @@ while($rs = mysqli_fetch_array($result))
 <tr>
 <td  align="left"><?=$rs[1]?></td>
 <td><?=$date2[2]."/".$date2[1]."/".$date2[0]?></td>
-<td  align="left"><? echo "$rs[6] $rs[7]";?></td>
+<td  align="left"><? echo "$rs[7] $rs[8]";?></td>
+<td align="center"><? if(!empty($rs[5])){?><a href="<?=htmlspecialchars('news/'.$rs[5],ENT_QUOTES)?>" target="_blank">PDF</a><? }?></td>
 <td><a name="<?=$rs[0]?>"></a><a href="javascript:void(0);" onClick="del('<?=$rs[0]?>')">ลบ</a>/<a href="javascript:void(0);" onClick="showedit(<?=json_encode((string)$rs[0]);?>,<?=htmlspecialchars(json_encode((string)$rs[1]),ENT_COMPAT);?>,<?=htmlspecialchars(json_encode(preg_replace('/\r|\n/','',(string)$rs[2])),ENT_COMPAT);?>)">แก้ไข</a></td>
 </tr>
 <?

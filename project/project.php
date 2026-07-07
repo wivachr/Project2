@@ -4,7 +4,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 var a = true;
 var b = true;
@@ -25,7 +24,7 @@ var idmaniedit;
 	$("#adding").hide();
 	$("#namecoadvisor").hide();
 	$("#snamecoadvisor").hide();
-	$("#changetorgor").hide();
+	/* changetorgor display managed by PHP inline style */
 	$("#nco").hide();
 	$("#tco").hide();
 	$("#sco").hide();
@@ -311,12 +310,20 @@ return true ;
 }
 </script><title></title>
 <style type="text/css">
-.left {
-	text-align: left;
-}
+body, td, th { font-family: Tahoma, Geneva, sans-serif; font-size: 13px; }
+.left { text-align: left; }
+#main-wrap { max-width: 820px; margin: 0 auto; }
+table.info-table { width: auto; margin: 0 auto; border-collapse: collapse; }
+table.info-table th { text-align: right; padding: 5px 12px; width: 200px; white-space: nowrap; font-weight: normal; color: #333; }
+table.info-table td { text-align: left; padding: 5px 12px; }
+table.info-table tr:nth-child(even) { background: #f7f7f7; }
+.section-divider { border: none; border-top: 1px solid #ccc; margin: 10px 0; }
+.action-row { text-align: center; padding: 12px 0; border-top: 1px solid #ddd; margin-top: 8px; }
+.action-row input[type=button] { margin: 3px 4px; padding: 4px 10px; }
 </style>
 </head>
 <body>
+<div id="main-wrap">
 <center>
     <h2>รายละเอียดโครงงานพิเศษของคุณ</h2>
 </center>
@@ -349,18 +356,22 @@ return true ;
 			  {
 				  $teacher = $rs3[1];
 			  }
+			  $master = '';
 			   $sql = "select * from committee,teacher,academictitle where teacher.id_academictitle = academictitle.id_academictitle AND  committee.id_teacher=teacher.id_teacher AND id_project='".$rs[0]."' AND position='ประธาน'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs3 = mysqli_fetch_array($result))
 			  {
 				  $master = $rs3[18]." ".$rs3[7]." ".$rs3[8];
 			  }
+			  $gum = '';
 			   $sql = "select * from committee,teacher,academictitle where teacher.id_academictitle = academictitle.id_academictitle AND  committee.id_teacher=teacher.id_teacher AND id_project='".$rs[0]."' AND position='กรรมการ'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs3 = mysqli_fetch_array($result))
 			  {
 				  $gum = $rs3[18]." ".$rs3[7]." ".$rs3[8];
 			  }
+			  $coad = '';
+			  $idco = 0;
 			  $sql = "select * from coadvisor,title where title.id_title = coadvisor.id_title AND id_project='".$rs[0]."'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs4 = mysqli_fetch_array($result))
@@ -370,41 +381,35 @@ return true ;
 			  }
 	  ?>
 
-  <table border="0" align="center"  >
+  <table class="info-table" border="0" align="center">
       <tr>
-      <th align="right" nowrap="nowrap" scope="col">สถานะโครงงาน :</th>
-      <th align="left">
-      <?=$rs[15]?>
-      </th>
+      <th>สถานะโครงงาน :</th>
+      <td><strong><?=$rs[17]?></strong></td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="col">รหัสโครงงาน :</th>
-      <th align="left">
-      <?=$rs[0]?>
-      </th>
+      <th>รหัสโครงงาน :</th>
+      <td><?=$rs[0]?></td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="col">ชื่อโครงงาน :</th>
-      <th align="left">
+      <th>ชื่อโครงงาน :</th>
+      <td>
       <input id="idproject" name="idproject" type="hidden" value="<?=$rs[0]?>" />
-      <input name="nameproject" type="text" disabled="disabled" value="<?=$rs[1]?>" id="nameproject" size="50" maxlength="50"/>
-      </th>
+      <input name="nameproject" type="text" disabled="disabled" value="<?=$rs[1]?>" id="nameproject" size="55" maxlength="1000"/>
+      </td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="col">กรณีศึกษา :</th>
-      <th align="left">
-      <input name="casestudy" type="text" id="casestudy" size="50" maxlength="50" value="<?=$rs[2]?>"  disabled="disabled"/></th>
+      <th>กรณีศึกษา :</th>
+      <td><input name="casestudy" type="text" id="casestudy" size="55" maxlength="1000" value="<?=$rs[2]?>" disabled="disabled"/></td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="col">ชื่อโครงงาน(ภาษาอังกฤษ) :</th>
-      <th align="left">
-      <input name="engnameproject" type="text" disabled="disabled" value="<?=$rs[12]?>" id="engnameproject" size="50" maxlength="50"/>
-      </th>
+      <th>ชื่อโครงงาน(ภาษาอังกฤษ) :</th>
+      <td>
+      <input name="engnameproject" type="text" disabled="disabled" value="<?=$rs[12]?>" id="engnameproject" size="55" maxlength="1000"/>
+      </td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="col">กรณีศึกษา(ภาษาอังกฤษ) :</th>
-      <th align="left">
-      <input name="engcasestudy" type="text" id="engcasestudy" size="50" maxlength="60" value="<?=$rs[13]?>"  disabled="disabled"/></th>
+      <th>กรณีศึกษา(ภาษาอังกฤษ) :</th>
+      <td><input name="engcasestudy" type="text" id="engcasestudy" size="55" maxlength="1000" value="<?=$rs[13]?>" disabled="disabled"/></td>
     </tr>
     <?
 	$sql = "select * from race where id_project='".$rs[0]."'";
@@ -425,8 +430,8 @@ if(mysqli_num_rows($result)!=0)
 }
 	?>
     <tr>
-      <th align="right" valign="top" nowrap="nowrap" scope="row">ผู้จัดทำ :</th>
-      <td align="left">
+      <th valign="top">ผู้จัดทำ :</th>
+      <td>
       <table cellpadding="0" cellspacing="0" border="0">
       <? 
 	  $count = 0;
@@ -453,8 +458,8 @@ if(mysqli_num_rows($result)!=0)
       </table>
 </td>
     </tr>
-		<tr><th align="right"></th>
-        <td align="left" nowrap="nowrap">
+		<tr><th></th>
+        <td>
         <div id="adding">
         <table cellpadding="0" cellspacing="0" border="0">
         <tr>
@@ -487,16 +492,16 @@ if(mysqli_num_rows($result)!=0)
           </td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="row">&nbsp;</th>
-      <td align="left"><a href="javascript:void(0);" id="addma">เพิ่มผู้จัดทำ</a></td>
+      <th>&nbsp;</th>
+      <td><a href="javascript:void(0);" id="addma">เพิ่มผู้จัดทำ</a></td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="row">อาจารย์ที่ปรึกษาร่วม :</th>
-      <td align="left"><? if($coad==""){?><a href="javascript:void(0);" id="addco">เพิ่มอาจารย์ที่ปรึกษาร่วม</a><span id="tg01">ไม่มีอาจาร์ยที่ปรึกษาร่วม</span><? }else{echo $coad.' <a id="delco" href="javascript:void(0);" onclick="delco('.$idco.')">ลบ</a>';}?></td>
+      <th>อาจารย์ที่ปรึกษาร่วม :</th>
+      <td><? if($coad==""){?><a href="javascript:void(0);" id="addco">เพิ่มอาจารย์ที่ปรึกษาร่วม</a><span id="tg01">ไม่มีอาจารย์ที่ปรึกษาร่วม</span><? }else{echo $coad.' <a id="delco" href="javascript:void(0);" onclick="delco('.$idco.')">ลบ</a>';}?></td>
     </tr>
                 <tr>
-              <th align="right"><span id="tco">คำนำหน้าชื่อที่ปรึกษาร่วม :</span></th>
-              <td align="left">
+              <th><span id="tco">คำนำหน้าชื่อที่ปรึกษาร่วม :</span></th>
+              <td>
                 <select name="idtitle" id="idtitle">
                 <option value="0">
                     ---เลือกคำนำหน้าชื่อ---
@@ -517,25 +522,20 @@ if(mysqli_num_rows($result)!=0)
               </td>
             </tr>
     <tr>
-    <th align="right" nowrap="nowrap" scope="row"><span id="nco">ชื่ออาจารย์ที่ปรึกษาร่วม :</span>
-    </th>
-    <td align="left"><input type="text" name="namecoadvisor" id="namecoadvisor" />
-    </td>
+    <th><span id="nco">ชื่ออาจารย์ที่ปรึกษาร่วม :</span></th>
+    <td><input type="text" name="namecoadvisor" id="namecoadvisor" /></td>
     </tr>
     <tr>
-    <th align="right" nowrap="nowrap" scope="row"><span id="sco">นามสกุลอาจารย์ที่ปรึกษาร่วม :</span>
-    </th>
-    <td align="left"><label for="snamecoadvisor"></label>
-      <input type="text" name="snamecoadvisor" id="snamecoadvisor" /></td>
+    <th><span id="sco">นามสกุลอาจารย์ที่ปรึกษาร่วม :</span></th>
+    <td><input type="text" name="snamecoadvisor" id="snamecoadvisor" /></td>
     </tr>
     <tr>
-    <th align="center" nowrap="nowrap" scope="row">&nbsp;</th>
-    <th align="left" nowrap="nowrap" scope="row"><input name="cob" type="button" id="cob" value="เพิ่มอาจารย์ที่ปรึกษาร่วม" onclick="funcaddco();"/></th>
+    <th>&nbsp;</th>
+    <td><input name="cob" type="button" id="cob" value="เพิ่มอาจารย์ที่ปรึกษาร่วม" onclick="funcaddco();"/></td>
     </tr>
     <tr>
-      <th align="right" scope="row">อาจารย์ที่ปรึกษา :</th>
-      <th align="left"><label for="idteacher"></label>
-        <select name="idteacher" id="idteacher"  disabled="disabled">
+      <th>อาจารย์ที่ปรึกษา :</th>
+      <td><select name="idteacher" id="idteacher" disabled="disabled">
           <option value="0">---เลือกอาจารย์---</option>
               <? 
 			  $sql = "select * from teacher order by initials_teacher";
@@ -561,23 +561,18 @@ if(mysqli_num_rows($result)!=0)
 			  }
 			  ?>
         </select>
-      </th>
-    </tr>
-    <? if($master!="")
-	{
-		?>
-        <tr>
-      <th align="right" nowrap="nowrap" scope="row">ประธาน :</th>
-      <td align="left"><?=$master?>
       </td>
+    </tr>
+    <? if($master!="") { ?>
+        <tr>
+      <th>ประธาน :</th>
+      <td><?=$master?></td>
       </tr>
       <? }
-	  if($gum!="")
-	  {
-	  ?>
+	  if($gum!="") { ?>
          <tr>
-      <th align="right" valign="top" nowrap="nowrap" scope="row">กรรมการ :</th>
-      <td align="left">
+      <th valign="top">กรรมการ :</th>
+      <td>
 	  <?
 			   $sql = "select * from committee,teacher,academictitle where teacher.id_academictitle = academictitle.id_academictitle AND  committee.id_teacher=teacher.id_teacher AND id_project='".$rs[0]."' AND position='กรรมการ'";
 			  $result = mysqli_query($connect, $sql);
@@ -591,38 +586,22 @@ if(mysqli_num_rows($result)!=0)
       </tr>
       <? } ?>
     <tr>
-      <th align="right" nowrap="nowrap" scope="row">อีเมลล์ผู้จัดทำ :</th>
-      <td align="left">
-      <input name="email" type="text"  disabled="disabled" id="email"  value="<?=$rs[8]?>" size="30"/>
-      </td>
+      <th>อีเมลล์ผู้จัดทำ :</th>
+      <td><input name="email" type="text" disabled="disabled" id="email" value="<?=$rs[8]?>" size="35"/></td>
     </tr>
     <tr>
-      <th align="right" nowrap="nowrap" scope="row">ที่อยู่ผู้จัดทำ :</th>
-      <td align="left">
-      <textarea id="address" name="address" cols="30" rows=""    disabled="disabled"><?=$rs[7]?></textarea>
-      </td>
+      <th valign="top">ที่อยู่ผู้จัดทำ :</th>
+      <td><textarea id="address" name="address" cols="40" rows="3" disabled="disabled"><?=$rs[7]?></textarea></td>
     </tr>
     <tr>
-      <th align="right" valign="middle" nowrap="nowrap" scope="row">ทก.01(.pdf) :</th>
-      <td align="left" valign="top">
+      <th valign="middle">ทก.01(.pdf) :</th>
+      <td valign="top">
       <input name="bup" id="bup" type="hidden" value="<?=$rs[9]?>" />
-      <?
-	  	if($rs[9]=="")
-		{
-			?>
-            <script language="JavaScript">
-<!--
-window.showtorgor();
-//-->
-</script>
-            <?
-		}
-		else
-		{
-	  ?>
-      <a href="<?=$rs[9]?>" target="_blank">ดู ทก.</a> <a href="javascript:void(0);" id="ctg">เปลี่ยน ทก.</a>
+      <? if($rs[9]!="") { ?>
+      <a href="<?=$rs[9]?>" target="_blank">ดู ทก.</a>
+      &nbsp;<a href="javascript:void(0);" id="ctg">เปลี่ยน ทก.</a>
       <? } ?>
-      <div id="changetorgor">
+      <div id="changetorgor"<? if($rs[9]!="") echo ' style="display:none"'; ?>>
             <iframe id="uploadtarget" name="uploadtarget" src="" style="width:0px;height:0px;border:0"></iframe>
       <form id="frmUpload" action="project/upload.php?idproject=<?=$rs[0]?>" method="post" enctype="multipart/form-data" onsubmit="return clickupload();" target="uploadtarget">
       <span id="upmsg"></span><br>
@@ -630,38 +609,12 @@ window.showtorgor();
 <input id="btnUpload" type="submit" value="อัพโหลด ทก.01">
 </form>
       </div>
+      <div id="s1" style="margin-top:15px">
+      <? if($rs[9]!=""&&$rs[10]=='1') { ?>
+      <input type="button" id="btnsubmittitleexam" value="ยื่นสอบหัวข้อ" onclick="submittitleexam()"/>
+      <? } ?>
+      </div>
       </td>
-    </tr>
-    <tr>
-      <th colspan="2" scope="row">
-      <br/>
-        <div id="s1">  
-        	<input type="button" name="edit" id="edit" value="แก้ไข" onclick="edit()" />
-          <input type="button" name="submittitleexam" id="submittitleexam" value="ยื่นสอบหัวข้อ" onclick="submittitleexam()" />
-          </div>
-          <div id="s7">  
-        	<input type="button" name="edit" id="edit" value="แก้ไข" onclick="edit()" />
-          </div>
-          <div id="s2">
-            <input type="button" name="edit" id="edit" value="แก้ไข" onclick="edit()" />  
-          <input type="button" name="printtitleexam" id="printtitleexam" value="พิมพ์ใบยื่นสอบหัวข้อ" onClick="window.open('report/formsubmittitleexam.php', '_blank', '')" />
-        </div>
-          <div id="s6">  
-          <input type="button" name="printtitleexam" id="printtitleexam" value="พิมพ์ใบยื่นสอบหกสิบเปอร์เซ็นต์" onClick="window.open('report/formsubmittitleexam-3.php','_blank', '')"  />
-        </div>
-        <div id="s4">  
-          <input type="button" name="printtitleexam" id="printtitleexam" value="พิมพ์ใบยื่นสอบร้อยเปอร์เซ็นต์" onClick="window.open('report/formsubmittitleexam-2.php', '_blank','')"  />
-    </div>
-          <div id="s3"> 
-          <input type="button" name="submittitleexam" id="submittitleexam" value="ยื่นสอบร้อยเปอร์เซ็นต์" onclick="submit100exam()" /> 
-          <input type="button" name="button" id="button" value="ยื่นสอบหกสิบ" onclick="submit60exam()" />
-          </div>
-          <div id="s5"> 
-          <input type="button" name="submittitleexam" id="submittitleexam" value="ยื่นสอบร้อย" onclick="submit100exam()" /> 
-          </div>
-      <input type="button" name="save" id="save" value="บันทึก" onclick="save()" />
-          <input type="button" name="cancel" id="cancel" value="ยกเลิก" onclick="cancel()"  />
-      </th>
     </tr>
   </table>
   <? 			 
@@ -669,8 +622,7 @@ window.showtorgor();
 			  mysqli_close($connect);
 	?>
 <br/>
-<br/>
-<br/>
-<div class="left">*หมายเหตุ ควรตั้งขอบกระดาษTop=8,Bottom=8,Left=9,Right=8ตรงส่วนHeader&Footerให้เลือกEmptyให้หมด ก่อนสั่งพิมพ์</div>
+<div class="left" style="font-size:11px; color:#666; padding: 4px 8px;">*หมายเหตุ ควรตั้งขอบกระดาษ Top=8, Bottom=8, Left=9, Right=8 ส่วน Header &amp; Footer ให้เลือก Empty ให้หมด ก่อนสั่งพิมพ์</div>
+</div><!-- /main-wrap -->
 </body>
 </html>

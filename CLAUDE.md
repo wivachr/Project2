@@ -95,6 +95,17 @@ assignexam → committee → exam → manipulator → projecthistory → project
 ### Cache-Busting
 Every `.load()` call appends `?pop=` + `Math.random()` to prevent browser caching of fragments.
 
+### Relative Paths in Fragments Resolve Against the Shell, Not the Fragment
+A fragment is inserted into the shell page's DOM, so any relative `src`/`href`/`action` inside it resolves against the **shell's URL** (e.g. `/Project2/officer.php`), not the fragment's own folder. A fragment living in `project/` that writes `action="upload.php"` actually submits to `/Project2/upload.php` (404) instead of `/Project2/project/upload.php`. Always prefix these with the full path from the site root (e.g. `action="project/upload.php"`), and don't re-include things the shell already loaded (e.g. a fragment should never have its own `<script src="_js/jquery.js">` — only the shell needs it).
+
+### Iframe File Uploads
+Multipart PDF uploads can't use the AJAX-GET pattern used elsewhere, so they go through a hidden iframe + form instead (see `project/upload.php`, `project/upload2.php`, `news/uploadnews.php`):
+```html
+<iframe id="uploadtarget" name="uploadtarget" style="width:0;height:0;border:0"></iframe>
+<form action="module/upload.php?id=<?=$id?>" method="post" enctype="multipart/form-data" target="uploadtarget" onsubmit="return clickupload();">
+```
+The target script echoes `<script>window.parent.uploadok()/uploadfalse()</script>` back into the iframe, handled by globally-scoped `uploadok()`/`uploadfalse()` functions in the shell or fragment. Don't call `mysqli_close($connect)` before the final query in these scripts — reusing a closed connection throws a fatal error on PHP 8.2 and silently kills the callback before it's sent.
+
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` academic year data folders, `*.sql`, `*.bak`, `*.log`
 - Never commit `connectdatabase.php` credential changes or DB dumps

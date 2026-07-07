@@ -19,7 +19,6 @@ body,td,th {
 		$semester = $rs[1];
 	}
 	?>
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 function checkid()
 {

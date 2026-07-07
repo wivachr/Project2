@@ -30,7 +30,6 @@ body,td,th {
 	}
 	mysqli_close($connect);
 	?>
-<script type="text/javascript" src="../_js/jquery.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
  $("#tel").hide();

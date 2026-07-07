@@ -31,7 +31,7 @@ $result2 = mysqli_query($connect, $sql);
 $result3 = mysqli_query($connect, $sql);
 ?>
 <tr>
-<td><?=$rs[0]?></td>
+<td align="center"><?=$rs[0]?></td>
 <td align="left"><?=$rs[9]?></td>
 <td align="left"><?=$rs[2]?></td>
 <td align="left"><?=$rs[3]?></td>

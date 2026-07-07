@@ -9,7 +9,8 @@
 		$id = $rs[0]+1;
 	}
 	$year = date("Y")+543;
-	$sql = "insert into news values('$id','$topicnews','$detailnews','".$_SESSION['iduser']."','$year".date("-n-j")."')";
+	$sql = "insert into news (id_news,topic_news,detail_news,id_user,date_news) values('$id','$topicnews','$detailnews','".$_SESSION['iduser']."','$year".date("-n-j")."')";
 	mysqli_query($connect, $sql);
 	mysqli_close($connect);
+	echo $id;
 ?>

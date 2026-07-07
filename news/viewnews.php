@@ -30,8 +30,13 @@ body,td,th {
   </tr>
   <tr>
     <td width="141" valign="top" scope="row">วันที่เขียน : <?=$date2[2]."/".$date2[1]."/".$date2[0]?></td>
-    <td width="578" valign="top" scope="row">ผู้เขียน : <?=$rs[6]?> <?=$rs[7]?></td>
+    <td width="578" valign="top" scope="row">ผู้เขียน : <?=$rs[7]?> <?=$rs[8]?></td>
   </tr>
+  <? if(!empty($rs[5])){ ?>
+  <tr>
+    <td colspan="2" valign="top" scope="row"><a href="<?=htmlspecialchars($rs[5],ENT_QUOTES)?>" target="_blank">ดาวน์โหลดไฟล์ PDF ประกอบข่าวสาร</a></td>
+  </tr>
+  <? } ?>
 </table>
 
 </body>

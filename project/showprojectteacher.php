@@ -27,7 +27,7 @@ while($rs = mysqli_fetch_array($Query))
 <tr>
 <td><?=$rs[0]?></td>
 <td  align="left"><a href="project/viewproject.php?idview=<?=$rs[0]?>" target="_blank"><?=$rs[1]?></a></td>
-<td  align="left"><?=$rs[15]?></td>
+<td  align="left"><?=$rs[17]?></td>
 </tr>
 <?
 }

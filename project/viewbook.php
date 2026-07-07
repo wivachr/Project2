@@ -62,7 +62,7 @@ body,td,th {
 <table border="0" align="center" >
   <tr>
     <th align="right" valign="top" nowrap="nowrap" scope="col">สถานะโครงงาน :</th>
-    <td align="left"><?=$rs[15]?></td>
+    <td align="left"><?=$rs[17]?></td>
   </tr>
   <tr>
     <th align="right" valign="top" nowrap="nowrap" scope="col">ชื่อโครงงาน :</th>

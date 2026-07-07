@@ -1,5 +1,6 @@
 ﻿<? include('../change.php'); ?>
 <?
+	if(!isset($idproject) || trim($idproject)==="" || !isset($namecoadvisor) || trim($namecoadvisor)==="") { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_coadvisor) from coadvisor";
 	$result = mysqli_query($connect, $sql);

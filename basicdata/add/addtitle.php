@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($idtitle2) || trim($idtitle2)==="" || !isset($titlename) || trim($titlename)==="") { exit; }
 	include('../../connectdatabase.php');
 	/*$sql = "select max(id_title) from title";
 	$result = mysqli_query($connect, $sql);

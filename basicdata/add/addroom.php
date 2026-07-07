@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($roomname) || trim($roomname)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_room) from room";
 	$result = mysqli_query($connect, $sql);

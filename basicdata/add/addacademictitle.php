@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($academictitlename) || trim($academictitlename)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_academictitle) from academictitle";
 	$result = mysqli_query($connect, $sql);

@@ -1,5 +1,6 @@
 ﻿<? include('../change.php'); ?>
 <?
+    if(!isset($year) || trim($year)==="" || !isset($semester) || trim($semester)==="") { exit; }
     include('../connectdatabase.php');
 	$sql = "update academicyear set year='$year',semester='$semester'";
 	mysqli_query($connect, $sql);

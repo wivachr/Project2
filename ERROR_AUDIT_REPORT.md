@@ -54,6 +54,25 @@ This audit re-verified all of the following remain fixed and did not regress:
 - **Excel bulk import**: added `.xlsx` import (via `xlsxreader.php`, a dependency-free `ZipArchive`+`SimpleXML` parser) for `student/importingstudent.php` and `register/importingregister.php`, replacing the old raw `.txt` import.
 - **`$mdfive = md5($password)` dead code**: 6 `basicdata/*.php` files had this leftover line inside their `<script>` block; since `$password` is never set on a normal page load, the resulting PHP warning broke the JavaScript, causing "every page looks broken" symptoms in the admin section.
 
+## Database changes log
+
+Beyond code fixes, this session made the following live database changes:
+
+**Schema:**
+- `news.pdf_news VARCHAR(150)` added — stores the PDF attachment path for news announcements.
+- `subject.id_subject`, `registration.id_subject`, `project.id_subject` changed from `int(10)` to `varchar(15)` — preserves meaningful leading zeros in subject codes (e.g. `060243202`). This reverted once mid-session when a stale `.sql` backup was restored; it was re-applied and re-verified against the code, which is the source of truth for this schema.
+
+**Data cleanup:**
+- Restored leading zeros on 12 subject codes (8-digit codes padded to 9; 6-digit codes intentionally left alone).
+- Deleted blank/placeholder rows from `right`, `typeexam`, `statusproject`, `room`, `academictitle` (kept `title.id_title=0`, an intentional "not selected" sentinel used by 21 real teacher records).
+- Deleted orphaned junk rows created by unvalidated "add" endpoints being hit during this session's testing sweep: 3 `teacher` rows, 1 `user` row, 42 `coadvisor` rows, 3 `news` rows, 3 `race` rows (all identifiable by a `0`/blank foreign key sentinel).
+- `academicyear` was accidentally blanked by the same testing sweep (via `year/changeyear.php`, which had no input validation) and restored to `2569/1`.
+
+**Data loss (acceptable — confirmed unused):**
+- `teacherfreetime` (per-teacher availability schedule) was wiped to 0 rows — `year/changeyear.php` ran an unconditional `DELETE FROM teacherfreetime` on every call, including a blank test hit. **Confirmed with the project owner that this table/feature isn't actually used in practice**, so this data loss is not a real-world problem. The underlying bug (unvalidated destructive query) is still fixed regardless, to prevent similar accidents with tables that *do* matter.
+
+**27 blank-name `project` rows** remain intentionally untouched — linked to real `user` accounts via the actual registration flow, flagged for the project owner's review rather than deleted unilaterally.
+
 ## Testing methodology notes
 
 Fatal-error and warning sweeps were done via direct unauthenticated `GET` requests (no session, no POST body) to every `.php` file. This means:

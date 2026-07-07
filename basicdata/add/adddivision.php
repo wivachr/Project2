@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($iddiv2) || trim($iddiv2)==="" || !isset($divisionname) || trim($divisionname)==="") { exit; }
 	include('../../connectdatabase.php');
 	/*$sql = "select max(id_division) from division";
 	$result = mysqli_query($connect, $sql);

@@ -114,6 +114,13 @@ Bulk-import pages (`student/importingstudent.php`, `register/importingregister.p
 ### `id_subject` is a VARCHAR, Not a Number
 `subject.id_subject`, `registration.id_subject`, and `project.id_subject` are `varchar(15)` — subject codes carry meaningful leading zeros (e.g. `060243202`). Never cast this to `(int)` or use it in arithmetic; always treat it as an opaque string (escape with `mysqli_real_escape_string`, compare with `=`). A prior bug in `project/registerproject2.php` cast it to `(int)` and silently stripped the leading zero.
 
+### Write Endpoints Never Validate Server-Side — Add It When Touching One
+Every `add*.php`/`edit*.php` handler in this codebase relies entirely on client-side JS validation before submitting; the PHP side blindly `INSERT`s/`UPDATE`s whatever it receives, with no check that required fields are non-empty. A blank or malformed request (a stray direct hit, a bot, a broken link) silently creates junk rows. Worse, a few handlers (`year/changeyear.php`, `headofdepartment/changehead.php`) `UPDATE` a **singleton settings table with no `WHERE` clause at all** — a blank request blanks out the one row the whole site depends on (this happened for real: `academicyear` got wiped this way, and `year/changeyear.php` also runs an unconditional `DELETE FROM teacherfreetime` on every call, which wiped that table too). When you touch any `add*.php`/`edit*.php`/singleton-`UPDATE` handler, add a guard at the top:
+```php
+if(!isset($requiredField) || trim($requiredField)==="") { exit; }
+```
+This has already been retrofitted onto ~21 handlers this session (see `ERROR_AUDIT_REPORT.md`) — but any handler not yet touched still has this gap.
+
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` academic year data folders, `*.sql`, `*.bak`, `*.log`
 - Never commit `connectdatabase.php` credential changes or DB dumps

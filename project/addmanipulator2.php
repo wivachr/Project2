@@ -1,5 +1,6 @@
 ﻿<? include('../change.php'); ?>
 <?
+	if(!isset($idstu1) || trim($idstu1)==="" || !isset($idproject) || trim($idproject)==="") { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_manipulator) from manipulator";
 	$result = mysqli_query($connect, $sql);

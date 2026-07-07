@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($iddept2) || trim($iddept2)==="" || !isset($departmentname) || trim($departmentname)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_department) from department";
 	$result = mysqli_query($connect, $sql);

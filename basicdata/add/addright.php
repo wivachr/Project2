@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($rightname) || trim($rightname)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_right) from `right`";
 	$result = mysqli_query($connect, $sql);

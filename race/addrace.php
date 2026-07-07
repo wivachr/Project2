@@ -1,5 +1,6 @@
 ﻿<? include('../change.php'); ?>
 <?
+	if(!isset($topicrace) || trim($topicrace)==="") { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_race) from race";
 	$result = mysqli_query($connect, $sql);

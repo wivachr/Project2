@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($statusprojectname) || trim($statusprojectname)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_statusproject) from statusproject";
 	$result = mysqli_query($connect, $sql);

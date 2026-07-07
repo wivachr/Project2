@@ -1,5 +1,6 @@
 ﻿<? include('../change.php'); ?>
 <?
+	if(!isset($nameteacher) || trim($nameteacher)==="") { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_user) from user";
 	$result = mysqli_query($connect, $sql);

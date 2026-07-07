@@ -1,5 +1,6 @@
 ﻿<? include('../../change.php'); ?>
 <?
+	if(!isset($typeexamname) || trim($typeexamname)==="") { exit; }
 	include('../../connectdatabase.php');
 	$sql = "select max(id_typeexam) from typeexam";
 	$result = mysqli_query($connect, $sql);

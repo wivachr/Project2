@@ -1,6 +1,7 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
+	if(!isset($idstu1) || trim($idstu1)==="" || empty($_SESSION["idproject"])) { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_manipulator) from manipulator";
 	$result = mysqli_query($connect, $sql);

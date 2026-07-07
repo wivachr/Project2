@@ -1,6 +1,7 @@
 ﻿<? session_start();?>
 <? include('../change.php'); ?>
 <?
+	if(!isset($topicnews) || trim($topicnews)==="") { exit; }
 	include('../connectdatabase.php');
 	$sql = "select max(id_news) from news";
 	$result = mysqli_query($connect, $sql);

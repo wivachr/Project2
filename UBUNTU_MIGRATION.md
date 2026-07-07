@@ -56,6 +56,62 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
 - **ไม่มี** การจำกัดสิทธิ์เข้าถึงโฟลเดอร์ internal ใด ๆ เลย (`news/uploads/`, โฟลเดอร์ปี-เทอม, `report/fpdf.php`, `report/font/makefont/makefont.php`, `xlsxreader.php` ล้วนเปิดให้เรียกตรงผ่าน URL ได้หมด) — ของเดิมเป็นแบบนี้อยู่แล้วบน XAMPP เช่นกัน ถือเป็นความเสี่ยงเดิมที่ควรพิจารณาปิดกั้นตอนตั้งค่า vhost ใหม่ (เช่น `<Directory>` block ปิด PHP execution ในโฟลเดอร์ upload) แต่ไม่ใช่สิ่งที่ "พังเพิ่ม" จากการย้ายเครื่อง
 - ตรวจ `upload_max_filesize`/`post_max_size` ใน `php.ini` ของเครื่องใหม่ให้ **เท่ากับหรือมากกว่า** ค่าปัจจุบันบน XAMPP — โค้ดอัปโหลดไฟล์ (`project/upload.php`, `news/uploadnews.php`, `student/importingstudent.php`, `register/importingregister.php`) **ไม่มีการเช็คขนาดไฟล์เองเลย** พึ่ง `php.ini` ล้วน ๆ ถ้าเครื่องใหม่ตั้งค่าเล็กกว่าเดิม การอัปโหลดไฟล์ใหญ่จะเงียบ ๆ ล้มเหลวโดยไม่มี error message ที่ชัดเจน
 
+## 6. เปิดใช้งาน HTTPS
+
+เซิร์ฟเวอร์นี้ใช้งานเฉพาะภายในเครือข่าย ไม่มีโดเมนสาธารณะ จึงใช้ **Let's Encrypt ไม่ได้** (ต้อง validate ผ่านอินเทอร์เน็ต) ทางเลือกคือ self-signed certificate หรือ internal CA
+
+**ตรวจโค้ดแล้ว: ไม่มี mixed-content risk** — grep หาโค้ดที่ hardcode `http://` แบบเต็ม URL (`href=`, `src=`, `action=`) ทั่วทั้ง `.php` แล้วไม่พบเลย ทุก path ในระบบเป็น relative URL ทั้งหมด ดังนั้นสลับมาใช้ HTTPS ได้โดยไม่ต้องแก้โค้ดแอปเลย เป็นงานฝั่ง server config ล้วน ๆ
+
+### ขั้นตอน
+
+1. เปิดใช้ mod_ssl:
+   ```bash
+   sudo a2enmod ssl
+   ```
+
+2. สร้าง self-signed certificate (อายุ ~2 ปี) —ตั้ง `CN` เป็นชื่อ/IP ที่ใช้เข้าเว็บจริงภายในวง:
+   ```bash
+   sudo mkdir -p /etc/ssl/project2
+   sudo openssl req -x509 -nodes -days 825 -newkey rsa:2048 \
+     -keyout /etc/ssl/project2/project2.key \
+     -out /etc/ssl/project2/project2.crt \
+     -subj "/C=TH/ST=Prachinburi/O=KMUTNB/OU=IT/CN=<hostname-หรือ-IP-ภายในที่ใช้เข้าเว็บ>"
+   ```
+   ถ้าภาควิชามี internal CA อยู่แล้ว (เช่นแจก root cert ผ่าน GPO ให้เครื่องนักศึกษา/บุคลากร) แนะนำ sign ด้วย CA นั้นแทน self-signed ตรง ๆ เพราะจะไม่มี warning "ไม่ปลอดภัย" โผล่ในเบราว์เซอร์ของเครื่องที่ trust CA นั้นอยู่แล้ว
+
+3. สร้าง vhost สำหรับ HTTPS `/etc/apache2/sites-available/project2-ssl.conf`:
+   ```apache
+   <VirtualHost *:443>
+       ServerName <hostname-หรือ-IP>
+       DocumentRoot /var/www/Project2
+       SSLEngine on
+       SSLCertificateFile /etc/ssl/project2/project2.crt
+       SSLCertificateKeyFile /etc/ssl/project2/project2.key
+       <Directory /var/www/Project2>
+           AllowOverride All
+           Require all granted
+       </Directory>
+   </VirtualHost>
+   ```
+
+4. เปิด site และ reload:
+   ```bash
+   sudo a2ensite project2-ssl.conf
+   sudo systemctl reload apache2
+   ```
+
+5. บังคับ redirect HTTP→HTTPS ใน vhost พอร์ต 80 เดิม (เพิ่มในไฟล์ vhost port 80):
+   ```apache
+   <VirtualHost *:80>
+       ServerName <hostname-หรือ-IP>
+       Redirect permanent / https://<hostname-หรือ-IP>/
+   </VirtualHost>
+   ```
+
+6. แจกจ่าย certificate (หรือ root CA ถ้าใช้ internal CA) ให้เครื่องผู้ใช้ติดตั้งเป็น trusted certificate — ถ้าข้ามขั้นตอนนี้ผู้ใช้จะเห็น warning "การเชื่อมต่อไม่เป็นส่วนตัว" ทุกครั้งที่เข้าเว็บ (ยังใช้งานได้ผ่านการกด "ดำเนินการต่อ" แต่ไม่ user-friendly และเสี่ยงให้ผู้ใช้เคยชินกับการกดผ่าน warning ด้านความปลอดภัย)
+
+7. (แนะนำ ทำหลังยืนยันว่า HTTPS ใช้งานได้จริงแล้วเท่านั้น) เปิด `session.cookie_secure=1` ใน `php.ini` เพื่อให้ session cookie ส่งเฉพาะผ่าน HTTPS เท่านั้น — **อย่าเปิดก่อน** เพราะถ้ายังมีบางคนเข้าผ่าน HTTP อยู่ session จะใช้งานไม่ได้เลย
+
 ## สิ่งที่ตรวจแล้ว "ไม่มีปัญหา" — ไม่ต้องแก้อะไร
 
 - **Case-sensitivity ของ `include`/`require`**: ตรวจครบทั้ง 578 จุดที่ include ไฟล์ทั่ว repo — ชื่อไฟล์ในโค้ดกับชื่อไฟล์จริงบน disk เป็นตัวพิมพ์เล็กตรงกันหมด ปลอดภัยจาก Linux filesystem ที่ case-sensitive
@@ -72,5 +128,6 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
 - [ ] พิมพ์รายงาน PDF (FPDF) แสดงภาษาไทยถูกต้อง ไม่มีตัวอักษรเพี้ยน
 - [ ] ข้อมูลเก่า (โฟลเดอร์ปี-เทอม, `news/uploads/`) ถูกย้ายมาครบและอ่าน/เขียนได้
 - [ ] ลบ/ไม่ deploy ไฟล์ `report/font/desktop.ini` (ไฟล์ metadata ของ Windows Explorer ที่หลงเหลืออยู่ ไม่ใช่ source code)
+- [ ] เข้าเว็บผ่าน `https://` ได้โดยไม่มี mixed-content warning ในหน้าไหนเลย (ไม่ควรมี เพราะไม่มี hardcode `http://` ในโค้ด แต่ควรเช็คจริงด้วยตา/console ของเบราว์เซอร์)
 
 ดู [CLAUDE.md](CLAUDE.md) สำหรับสถาปัตยกรรมโดยรวม และ [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md) สำหรับปัญหาที่ตรวจพบและแก้ไปแล้วก่อนหน้านี้

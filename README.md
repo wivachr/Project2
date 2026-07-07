@@ -9,6 +9,13 @@
 - **Database:** MySQL
 - **Dev Server:** XAMPP
 
+## เอกสารเพิ่มเติม
+
+- [CLAUDE.md](CLAUDE.md) — architecture, pattern, และ gotcha เชิงลึกสำหรับนักพัฒนา
+- [AGENTS.md](AGENTS.md) — สรุปแบบย่อของ CLAUDE.md สำหรับ Codex/AI agent อื่น
+- [SITE_STRUCTURE.md](SITE_STRUCTURE.md) — แผนผัง navigation เต็มรูปแบบของทั้ง 4 portal (เมนูไหนโหลด fragment ไหน)
+- [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md) — รายงานตรวจสอบปัญหาที่พบและแก้ไขทั้งหมด
+
 ## การติดตั้งและรัน
 
 1. ติดตั้ง [XAMPP](https://www.apachefriends.org/) และเปิด Apache + MySQL
@@ -61,7 +68,7 @@ Project2/
 └── img/, image/           # รูปภาพ
 ```
 
-ดูรายละเอียด architecture/pattern เชิงลึกได้ที่ `CLAUDE.md`, และปัญหาที่ตรวจพบ/แก้ไขทั้งหมดได้ที่ `ERROR_AUDIT_REPORT.md`
+ดูรายละเอียด architecture/pattern เชิงลึกได้ที่ [CLAUDE.md](CLAUDE.md), แผนผัง navigation เต็มรูปแบบได้ที่ [SITE_STRUCTURE.md](SITE_STRUCTURE.md), และปัญหาที่ตรวจพบ/แก้ไขทั้งหมดได้ที่ [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md)
 
 ## ขั้นตอนการสอบโครงงาน (Officer Workflow)
 
@@ -77,4 +84,4 @@ Project2/
 - ทุก `.load()` ต่อท้าย `?pop=Math.random()` เพื่อป้องกัน browser cache
 - ใช้ `json_encode()` ส่งค่า PHP เข้า JS onclick เสมอ
 - ลำดับลบข้อมูล (FK): `assignexam → committee → exam → manipulator → projecthistory → project`
-- ดูรายงานปัญหาที่ตรวจพบและแก้ไขทั้งหมดได้ที่ `ERROR_AUDIT_REPORT.md`
+- ดูรายงานปัญหาที่ตรวจพบและแก้ไขทั้งหมดได้ที่ [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md)

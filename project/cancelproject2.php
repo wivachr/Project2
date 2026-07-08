@@ -1,6 +1,10 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
 <?
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	if(!isset($id) || trim($id)==="") { exit; }
     include('../connectdatabase.php');
+	$id = (int)$id;
 	$sql = "select id_statusproject from project where id_project = $id";
 	$result = mysqli_query($connect, $sql);
 	while($result && $rs = mysqli_fetch_array($result))

@@ -190,6 +190,18 @@ function clearre() {
     <?
     include('../connectdatabase.php');
 
+    $nameproject    = mysqli_real_escape_string($connect, $nameproject);
+    $casestudy      = mysqli_real_escape_string($connect, $casestudy);
+    $engnameproject = mysqli_real_escape_string($connect, $engnameproject);
+    $engcasestudy   = mysqli_real_escape_string($connect, $engcasestudy);
+    $id_subject     = mysqli_real_escape_string($connect, $id_subject);
+    $sec            = mysqli_real_escape_string($connect, $sec);
+    $address        = mysqli_real_escape_string($connect, $address);
+    $email          = mysqli_real_escape_string($connect, $email);
+    $idstu1         = mysqli_real_escape_string($connect, $idstu1);
+    $tel            = mysqli_real_escape_string($connect, $tel);
+    $idteacher      = (int)$idteacher;
+
     $project_type      = (isset($_POST['project_type']) && $_POST['project_type'] === 'year') ? 'year' : 'term';
     $parent_project_id = (isset($_POST['parent_project_id']) && $_POST['parent_project_id'] !== '') ? (int)$_POST['parent_project_id'] : null;
 

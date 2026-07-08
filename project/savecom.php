@@ -1,9 +1,16 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
 <?
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	if(!isset($id) || trim($id)==="" || !isset($idteacher) || trim($idteacher)==="") { exit; }
 include('../connectdatabase.php');
+	$id = (int)$id;
+	$idteacher = (int)$idteacher;
+	$type = mysqli_real_escape_string($connect, $type);
+	$detail = mysqli_real_escape_string($connect, $detail);
 	$sql = "delete from committee where id_project='$id' AND position<>'ที่ปรึกษา'";
 	mysqli_query($connect, $sql);
-	$guma = explode(",", $temp);
+	$guma = array_map('intval', explode(",", $temp));
 	$sql = "select max(id_committee) from committee";
 	$result = mysqli_query($connect, $sql);
 	while($rs = mysqli_fetch_array($result))

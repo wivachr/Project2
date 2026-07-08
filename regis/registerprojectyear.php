@@ -170,6 +170,13 @@ function clearre()
     		<td valign="middle" align="center">
     <?
 					include('../connectdatabase.php');
+					$nameproject = mysqli_real_escape_string($connect, $nameproject);
+					$casestudy = mysqli_real_escape_string($connect, $casestudy);
+					$engnameproject = mysqli_real_escape_string($connect, $engnameproject);
+					$engcasestudy = mysqli_real_escape_string($connect, $engcasestudy);
+					$id_subject = mysqli_real_escape_string($connect, $id_subject);
+					$sec = mysqli_real_escape_string($connect, $sec);
+					$oldproject = (int)$oldproject;
 					$sql = "select max(id_project) from project where year_project = '$year' AND semester_project ='$semester'";
 					$result = mysqli_query($connect, $sql);	
 						while($rs = mysqli_fetch_array($result))

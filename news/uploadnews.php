@@ -1,8 +1,19 @@
+<? session_start(); ?>
 <? include('../change.php');
 	$type_file = pathinfo($_FILES['fileupload']['name'], PATHINFO_EXTENSION);
 ?>
 <?php
-if(strtolower($type_file)!="pdf")
+if(!isset($_SESSION['iduser']))
+{
+	?>
+	<script language="JavaScript">
+<!--
+window.parent.uploadfalse();
+//-->
+	</script>
+	<?
+}
+else if(strtolower($type_file)!="pdf")
 {
 	?>
 	<script language="JavaScript">

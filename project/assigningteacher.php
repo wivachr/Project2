@@ -1,7 +1,12 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
 <?
-$guma = explode(",", $temp);
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	if(!isset($id) || trim($id)==="" || !isset($idteacher) || trim($idteacher)==="") { exit; }
 	include('../connectdatabase.php');
+	$id = (int)$id;
+	$idteacher = (int)$idteacher;
+	$guma = array_map('intval', explode(",", $temp));
 	$sql = "select max(id_committee) from committee";
 	$result = mysqli_query($connect, $sql);
 	while($rs = mysqli_fetch_array($result))

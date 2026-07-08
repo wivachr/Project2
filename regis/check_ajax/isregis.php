@@ -1,5 +1,6 @@
 ﻿<?
 	include('../../connectdatabase.php');
+	$idstudent = mysqli_real_escape_string($connect, $_GET["idstudent"]);
 	$sql = "select * from academicyear";
 	$result = mysqli_query($connect, $sql);
 	while($rs = mysqli_fetch_array($result))
@@ -7,7 +8,7 @@
 		$year = $rs[0];
 		$semester = $rs[1];
 	}
-	$regis = mysqli_query($connect, "select * from registration,student where student.id_student=registration.id_student AND year_registration='$year' and semester_registration='$semester' AND student.id_student='".$_GET["idstudent"]."'");
+	$regis = mysqli_query($connect, "select * from registration,student where student.id_student=registration.id_student AND year_registration='$year' and semester_registration='$semester' AND student.id_student='".$idstudent."'");
 	if(mysqli_num_rows($regis)!=0)
 	{
 		while($rg = mysqli_fetch_array($regis))

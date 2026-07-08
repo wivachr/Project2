@@ -25,6 +25,22 @@ Applied a consistent pattern to every affected file: `session_start()` → role/
 
 `loging.php` (the actual login handler) was already using a proper prepared statement — confirmed secure, not touched.
 
+### Follow-up sweep (second pass)
+
+After the first two commits, a dedicated read-only verification agent re-scanned the whole repo for any write endpoint the original audit had missed. It found 44 more files with gaps, all fixed in a third commit:
+
+- **Account takeover risk (highest severity of the whole audit)**: `user/resetuser.php` and `user/resetuser2.php` (admin's "reset a user's password" buttons) had no auth check at all — anyone who knew a `id_user` could reset any account's password with an unauthenticated GET request. `password/changingpassword.php` (the self-service "change my password" endpoint) trusted a client-supplied `iduser` GET parameter instead of `$_SESSION['iduser']` — the old-password check was JS-only and never enforced server-side, so any logged-in user could change *any other* user's password by tampering the request. Fixed by ignoring the GET param entirely and always operating on the session's own user id, plus adding proper role checks to the two admin reset endpoints.
+- **Singleton-settings wipe risk**: `year/changeyear.php` and `headofdepartment/changehead.php` already had non-empty-field guards from earlier work but no session/role check — anyone could still hit them directly. Added admin-only checks (these are the two handlers documented in `CLAUDE.md` as having actually wiped `academicyear`/`teacherfreetime` for real in the past).
+- **23 `project/*` action handlers** (submit/approve/assign-exam/assign-teacher/save-result/cancel/book/coadvisor/manipulator/editproject) — these are the "verb" endpoints behind the officer exam workflow and the student's own project-editing form, distinct from the `edit*.php`/`view*.php` files fixed in the first two commits. Added officer-only or ownership-based checks (verified via a `select id_project from project where ... AND (id_user=session OR right='2')` pattern for endpoints keyed by a child-row id like `id_manipulator`/`id_coadvisor` rather than `id_project` directly), plus escaping/casts. `project/submit100exam.php`/`submit60exam.php`/`submittitleexam.php` also got a dedupe guard (reject if a pending exam row already exists for that project+type), closing the double-submit-creates-duplicate-rows bug documented elsewhere in `CLAUDE.md`.
+- **`basicdata/add/*.php` (13 files) and `race/addrace.php`** — the `add` handlers were missed even though their `edit`/`del` siblings were fixed in commit 1. Same admin-only (or officer-only for room/race) pattern applied.
+- `exam/assigningexam2.php` — a second, separate "assign exam date" endpoint distinct from the already-fixed `exam/editassignexam.php`/`editingassignexam.php`.
+- `news/addnews.php` had `session_start()` but no actual `$_SESSION` check (unlike its already-fixed `edit`/`del` siblings); `news/uploadnews.php` and `news/uploadnewsimage.php` had no auth at all, letting anyone overwrite any news item's PDF/image.
+- `register/importingregister.php`, `student/importingstudent.php` — the `.xlsx` bulk-import endpoints already escaped their data correctly but had no auth gate; added officer-only checks.
+- `regis/registerproject.php`, `regis/registerprojectyear.php` — the public, intentionally-unauthenticated self-registration forms had several unescaped fields flowing into `INSERT`/`SELECT` statements (most notably `registerprojectyear.php`'s `$oldproject`, used raw in a `WHERE id_project='$oldproject'`). These stay unauthenticated by design (students register before they have an account) but now escape/cast every interpolated value.
+- `regis/check_ajax/canuse.php`, `isold.php`, `isregis.php` — read-only AJAX lookups used by the registration forms above, all interpolated `$_GET["idstudent"]` unescaped; now escaped.
+
+All 97 files across the three commits were verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

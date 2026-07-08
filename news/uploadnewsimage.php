@@ -1,9 +1,20 @@
+<? session_start(); ?>
 <? include('../change.php');
 	$type_file = strtolower(pathinfo($_FILES['fileuploadimage']['name'], PATHINFO_EXTENSION));
 	$allowed = array('jpg','jpeg','png','gif');
 ?>
 <?php
-if(!in_array($type_file, $allowed, true))
+if(!isset($_SESSION['iduser']))
+{
+	?>
+	<script language="JavaScript">
+<!--
+window.parent.uploadfalseimg();
+//-->
+	</script>
+	<?
+}
+else if(!in_array($type_file, $allowed, true))
 {
 	?>
 	<script language="JavaScript">

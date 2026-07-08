@@ -1,7 +1,10 @@
-﻿<? include('../../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../../change.php'); ?>
 <?
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='1') { exit; }
 	if(!isset($statusprojectname) || trim($statusprojectname)==="") { exit; }
 	include('../../connectdatabase.php');
+	$statusprojectname = mysqli_real_escape_string($connect, $statusprojectname);
 	$sql = "select max(id_statusproject) from statusproject";
 	$result = mysqli_query($connect, $sql);
 	while($rs = mysqli_fetch_array($result))

@@ -1,6 +1,16 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
 <?
+	if(!isset($_SESSION['iduser'])) { exit; }
+	if(!isset($idproject) || trim($idproject)==="") { exit; }
 	include('../connectdatabase.php');
+	$idproject = (int)$idproject;
+	$sqlchk = "select id_project from project where id_project='$idproject' AND (id_user='".(int)$_SESSION['iduser']."' OR '".($_SESSION['right'] ?? '')."'='2')";
+	$resultchk = mysqli_query($connect, $sqlchk);
+	if(mysqli_num_rows($resultchk)==0) { exit; }
+	$sqldupe = "select id_exam from exam where id_project='$idproject' AND id_typeexam='3' AND id_statusproject='20'";
+	$resultdupe = mysqli_query($connect, $sqldupe);
+	if(mysqli_num_rows($resultdupe)>0) { exit; }
 	$sql = "select * from academicyear";
 	 $result = mysqli_query($connect, $sql);
 	 while($rs = mysqli_fetch_array($result))

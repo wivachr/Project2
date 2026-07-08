@@ -98,6 +98,22 @@ A sixth independent sweep specifically re-verified all 32 files from the previou
 
 All 5 modified files (plus 1 deletion) verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (eighth pass) — the most severe finding of the whole effort
+
+A seventh independent sweep found a vulnerability in **`change.php` itself** — the file included by roughly 250 of the app's ~328 PHP files, right after `session_start()`, on nearly every single page. This one finding, if left unfixed, would have silently defeated every `$_SESSION`-based auth check added across all 8 prior commits.
+
+**The bug:** `change.php`'s "variable variables" extraction loop (`foreach ($_GET as $_k=>$_v) { ${$_k}=$_v; }`, same for `$_POST`) used a denylist of only 8 database-connection-related names (`connect`, `host`, `username`, `passwd`, `dbname`, `stmt`, `result`, `rs`) and a regex (`/^\w+$/`) that allowed any word-character variable name — including names starting with an underscore. PHP superglobal names (`_SESSION`, `_COOKIE`, `_SERVER`, `_ENV`, etc.) all start with an underscore and were never on the denylist. A request parameter literally named with array syntax — e.g. `?_SESSION[right]=2&_SESSION[iduser]=1` — caused the loop to execute `${'_SESSION'} = [...]`, which **overwrites the real `$_SESSION` superglobal** with fully attacker-controlled data, *after* `session_start()` had already loaded the legitimate session. This defeated every `if(!isset($_SESSION['right']) || $_SESSION['right']!='N') { exit; }` gate in the app (unauthenticated full admin/officer/teacher/student impersonation), and every ownership check built on `$_SESSION['iduser']` (e.g. `WHERE id_user='$_SESSION[iduser]'` in `project/project.php`, `report/formsubmit100exam.php`, etc. — an attacker could set `_SESSION[iduser]` to any target user's id and pass the check).
+
+This was empirically reproduced end-to-end against the real `change.php` on this machine's PHP 8.2 before the fix (a crafted GET query string flipped a simulated officer-only check from "denied" to "granted"), and re-verified as closed after the fix, with the app's own variable-extraction behavior for legitimate parameters (e.g. `nameproject`) confirmed still working correctly.
+
+**The fix:** changed the regex from `/^\w+$/` (any word character, including leading underscore) to `/^[a-zA-Z]\w*$/` (must start with a letter) — this blocks every PHP superglobal in one shot, since they all start with `_`, rather than trying to enumerate and blocklist each one individually (a denylist approach that's inherently fragile against PHP adding new superglobals in the future). Also added `'GLOBALS'` to the explicit denylist for documentation purposes, though PHP 8.1+ already blocks reassignment of `$GLOBALS` itself at the language level (verified).
+
+Since this file is included by nearly every page in the app, the fix was verified with a full-repo `php -l` sweep (328/328 files pass) rather than just the files directly touched.
+
+Also fixed in this pass — files with `session_start()` but no actual `isset($_SESSION[...])` check (the "silent no-op" bug class this whole audit started from), missed by earlier "container page" sweeps because these specific ones rely on ownership-scoped `WHERE` clauses rather than a role check, which masked the missing gate as lower-impact on its own (until combined with the `change.php` bug above, at which point it became directly exploitable): `project/project.php`, `viewedit.php`, `viewexam.php`, `teacher/formeditteacher.php`, `report/formsubmittitleexam.php`/`-2`/`-3`, `report/formsubmit100exam.php` (all gated to "any logged-in user," matching their existing ownership-scoped queries) — plus two more officer-only container pages, `report/showcase.php`/`showfall.php`.
+
+All 11 modified files verified with `php -l`; full-repo sweep (328 files) also clean.
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

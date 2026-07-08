@@ -1,18 +1,18 @@
 <?php
-$_blocked = ['connect', 'host', 'username', 'passwd', 'dbname', 'stmt', 'result', 'rs'];
+$_blocked = ['connect', 'host', 'username', 'passwd', 'dbname', 'stmt', 'result', 'rs', 'GLOBALS'];
 
 foreach ($_GET as $_k => $_v) {
-    if (!in_array($_k, $_blocked, true) && preg_match('/^\w+$/', $_k)) {
+    if (!in_array($_k, $_blocked, true) && preg_match('/^[a-zA-Z]\w*$/', $_k)) {
         ${$_k} = $_v;
     }
 }
 foreach ($_POST as $_k => $_v) {
-    if (!in_array($_k, $_blocked, true) && preg_match('/^\w+$/', $_k)) {
+    if (!in_array($_k, $_blocked, true) && preg_match('/^[a-zA-Z]\w*$/', $_k)) {
         ${$_k} = $_v;
     }
 }
 foreach ($_FILES as $_k => $_v) {
-    if (!in_array($_k, $_blocked, true) && preg_match('/^\w+$/', $_k)) {
+    if (!in_array($_k, $_blocked, true) && preg_match('/^[a-zA-Z]\w*$/', $_k)) {
         ${$_k . "_name"}  = $_v['name'];
         ${$_k . "_type"}  = $_v['type'];
         ${$_k . "_size"}  = $_v['size'];

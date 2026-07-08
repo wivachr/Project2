@@ -65,6 +65,19 @@ A third independent read-only verification agent, briefed to assume nothing and 
 
 All 18 modified files (plus 1 more deletion) verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (fifth pass)
+
+A fourth independent sweep, this time cross-referencing the complete file list against every file touched by the 4 prior security commits to build a definitive "never touched" list (148 files, 62 containing `mysqli_query()`), manually inspected every one of those 62, and additionally checked for non-SQL vulnerability classes (`unserialize()`, `eval()`, command execution, dynamic `include()`, path traversal). No SQL injection or command-execution findings this round — the remaining gaps were all the same shape: officer/admin report or listing pages with **zero** authentication sitting beside already-fixed siblings in the same directory, disclosing PII (student IDs/names/phone numbers, or in one case admin/officer login usernames) to anyone, logged in or not:
+
+- `report/showtableexam.php` (its sibling `showtableexamfix.php` was fixed in pass 4 — this differently-named one, used for the officer's "all teachers" schedule view, was missed) — added officer-only check.
+- `report/noproject.php`/`shownoproject.php`, `report/exp.php`/`showexp.php`, `report/noexam.php`/`shownoexam.php` (siblings `noexam2.php`/`shownoexam2.php` were fixed in pass 3) — added officer-or-teacher checks, matching how both roles reach these pages from `officer.php`/`teacher.php`.
+- `user/showuser.php` — had `session_start()` but no actual check; discloses every admin/officer account's real name, **login username**, and role. Added admin-only check.
+- `project/shows2.php` through `shows7.php` (7 files: the officer's exam-workflow queue listings — title-exam intake, committee assignment, exam scheduling, print-eval, save-result, thesis-book/TK.01 submission) — same gap as `project/showproject.php` (fixed pass 5), siblings in the same directory were missed. Added officer-only checks.
+
+**One fix from pass 5 was reverted as a false positive**: `project/showproject2.php` had been gated officer-only, but it is the sole backend for the **intentionally public** "ดูรายชื่อหัวข้อโครงงานพิเศษ" (browse approved project titles) page linked directly from `index.php`'s anonymous login screen via the standalone `showproject.php` — a legitimate pre-login showcase feature, not a bug. The officer-only gate has been removed from `showproject2.php`, keeping only the `(int)$start` cast. Likewise `report/showtableexam2.php`/`tableexam.php` (linked from the same public login screen as "ตารางสอบโครงงานพิเศษ") were confirmed to be intentionally public and were deliberately left ungated — though it's worth noting for a future decision that this public exam-schedule page does display student phone numbers, which may be more than the page needs to show publicly; that's a data-minimization/product question, not something addressed in this security pass.
+
+All 16 modified files verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

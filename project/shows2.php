@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <h2>รับการเรื่องสอบ</h2>
 <table width="100%" border="1" bordercolor="#000000"cellpadding="0" cellspacing="1">
     <tr>

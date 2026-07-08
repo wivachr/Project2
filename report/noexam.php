@@ -1,6 +1,8 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || ($_SESSION['right']!='2' && $_SESSION['right']!='3')) { exit; } ?>
 <?php
-	include('../connectdatabase.php'); 
+	include('../connectdatabase.php');
 	$sql = "select * from academicyear";
 	 $result = mysqli_query($connect, $sql);
 	 while($rs = mysqli_fetch_array($result))

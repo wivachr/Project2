@@ -1,6 +1,4 @@
-﻿<? session_start(); ?>
-<? include('../change.php'); ?>
-<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
+﻿<? include('../change.php'); ?>
 <p>
   <input type="text" name="sexam" id="sexam" />
   <input type="button" name="searchex" id="searchex" value="ค้นหา" onclick="searchexamp();"/>

@@ -1,4 +1,7 @@
-﻿<script type="text/javascript">
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
+<script type="text/javascript">
 var idstudent;
 var keys="";
 	$(document).ready(function() {

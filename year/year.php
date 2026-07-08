@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
                     <? include('../connectdatabase.php');
 			  $year = 0; $semester = 0;
 			  $sql = "select * from academicyear";

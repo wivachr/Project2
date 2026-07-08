@@ -1,7 +1,7 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
-	if(!isset($_SESSION['right']) || $_SESSION['right']!='1') { exit; }
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
     if(!isset($year) || trim($year)==="" || !isset($semester) || trim($semester)==="") { exit; }
     include('../connectdatabase.php');
 	$year = mysqli_real_escape_string($connect, $year);

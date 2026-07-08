@@ -1,10 +1,14 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
-	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
-	if(!isset($id) || trim($id)==="" || !isset($nameteacher) || trim($nameteacher)==="") { exit; }
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='3') { exit; }
+	if(!isset($nameteacher) || trim($nameteacher)==="") { exit; }
     include('../connectdatabase.php');
-	$id = (int)$id;
+	$sqlchk = "select id_teacher from teacher where id_user='".(int)$_SESSION['iduser']."'";
+	$resultchk = mysqli_query($connect, $sqlchk);
+	$rowchk = mysqli_fetch_array($resultchk);
+	if(!$rowchk) { exit; }
+	$id = (int)$rowchk[0];
 	$idatitle = (int)$idatitle;
 	$idtitle = (int)$idtitle;
 	$nameteacher = mysqli_real_escape_string($connect, $nameteacher);

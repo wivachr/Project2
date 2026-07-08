@@ -78,6 +78,16 @@ A fourth independent sweep, this time cross-referencing the complete file list a
 
 All 16 modified files verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (sixth pass)
+
+A fifth independent sweep, specifically briefed to distinguish intentionally-public pages (reachable from `index.php`'s anonymous login screen — like `showproject2.php`, correctly left ungated in pass 6) from pages that should be gated but aren't, and to check for **wrong-role** auth checks (not just missing ones), found:
+
+- **Two wrong-role bugs introduced by this very hardening effort**: `year/changeyear.php` and `headofdepartment/changehead.php` were gated `right=='1'` (admin) in pass 3, but both handlers are exclusively linked from `officer.php` — `admin.php` has no link to either. This silently broke a real officer feature ("เปลี่ยนภาคการศึกษา"/"เปลี่ยนหัวหน้าภาค") for months of intended use. Fixed to `right=='2'`.
+- **`teacher/editteacher2.php`**: gated `right=='2'` (officer) in pass 3, but it's the POST target of `teacher/formeditteacher.php` — the teacher **self-service** profile-edit form (right=3), and unlike its correct officer-facing sibling `editteacher.php`, it had no ownership check at all. Fixed to `right=='3'` **and** added a server-side lookup deriving the teacher row from `$_SESSION['iduser']` instead of trusting the client-submitted `$id` — closes what would otherwise have become an IDOR (any teacher editing any other teacher's record) the moment the role value got corrected without also adding ownership scoping.
+- **~30 more "container"/listing pages missing auth entirely**, all in modules whose sibling add/edit/del endpoints were already fixed: `user/usermange.php` (discloses every account's username, including admin/officer, to unauthenticated requests — high severity, credential enumeration), all 11 `basicdata/*.php` admin-module container pages and their matching `basicdata/show/show*.php` listing fragments (admin-only, except `room.php`/`showroom.php` which admin+officer both use), `headofdepartment/head.php`, `race/race.php`/`showrace.php`, `teacher/teacher.php`, `student/studentmange.php` (also had no `change.php` include at all — added), `register/register.php`, `year/year.php` — all gated to the role that module's shell (`admin.php` vs `officer.php`) actually links them from.
+
+All 32 modified files verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

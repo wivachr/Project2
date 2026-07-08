@@ -1,4 +1,6 @@
+<? session_start(); ?>
 <? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || ($_SESSION['right']!='1' && $_SESSION['right']!='2')) { exit; } ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

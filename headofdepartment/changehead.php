@@ -1,7 +1,7 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
-	if(!isset($_SESSION['right']) || $_SESSION['right']!='1') { exit; }
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
     if(!isset($idteacher) || trim($idteacher)==="") { exit; }
     include('../connectdatabase.php');
 	$idteacher = (int)$idteacher;

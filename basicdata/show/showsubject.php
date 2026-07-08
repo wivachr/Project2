@@ -1,4 +1,6 @@
+<? session_start(); ?>
 <? include('../../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='1') { exit; } ?>
 <table width="43%" border="0" cellpadding="0" cellspacing="1">
     <tr>
     <td width="" align="center" bgcolor="#CCCCCC">รหัสวิชา</td>

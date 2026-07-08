@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="1">
     <tr>
       <td width="13%"  align="center" bgcolor="#CCCCCC">รหัสโครงงานพิเศษ</td>

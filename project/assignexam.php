@@ -1,6 +1,10 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
 <?
-include('../connectdatabase.php'); 
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	$id = (int)$id;
+	$idsubmit = (int)$idsubmit;
+include('../connectdatabase.php');
 	$c = 0;
 	$sql = "select * from committee where id_project = '$id' and position<>'ที่ปรึกษา'";
 	$result = mysqli_query($connect, $sql);

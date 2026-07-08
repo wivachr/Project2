@@ -1,5 +1,6 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
+<? if(!isset($_SESSION['iduser'])) { exit; } ?>
 <h2>โครงงานพิเศษทั้งหมด</h2>
 <p>
   <input type="text" name="sexam" id="sexam" />
@@ -15,6 +16,7 @@
   if(!isset($start)){
 $start = 0;
 }
+$start = (int)$start;
 $limit = '10'; // แสดงผลหน้าละกี่หัวข้อ
 if(!isset($key)){ $key = ''; }
 $key = mysqli_real_escape_string($connect, $key);

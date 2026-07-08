@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <h2>ดูข้อมูลการสอบ</h2>
 <p>
   <label for="sexam"></label>
@@ -16,6 +18,7 @@
     </tr>
  <? include('../connectdatabase.php');
  if(!isset($start)){ $start = 0; }
+ $start = (int)$start;
  if(!isset($key)){ $key = ''; }
 $key = mysqli_real_escape_string($connect, $key);
 $limit = '20'; // แสดงผลหน้าละกี่หัวข้อ

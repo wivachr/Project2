@@ -1,5 +1,9 @@
-﻿<? include('../change.php'); ?>
- <? include('../connectdatabase.php');
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<?
+	if(!isset($_SESSION['right']) || ($_SESSION['right']!='2' && $_SESSION['right']!='3')) { exit; }
+	include('../connectdatabase.php');
+	$t = (int)$t;
 $sql = "select project.id_project,name_project,engname_project,casestudy_project,name_typeexam,date_assignexam,time_assignexam,name_room,endtime_assignexam from assignexam,room,exam,project,typeexam,committee where project.id_project=committee.id_project AND committee.position<>'ที่ปรึกษา' AND committee.id_teacher='$t' AND assignexam.id_room=room.id_room AND assignexam.id_exam=exam.id_exam AND exam.id_statusproject ='21' AND exam.id_project=project.id_project AND typeexam.id_typeexam = exam.id_typeexam order by date_assignexam,time_assignexam";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)
@@ -188,7 +192,7 @@ while($rs = mysqli_fetch_array($result))
 <tr><td colspan="7" bgcolor="#CCCCCC">&nbsp;</td></tr>
   </table>
 <p>
-  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/tableexamf.php?t='+<?=$t?>,'_blank','')" /></center>
+  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/tableexamf.php?t='+<?=(int)$t?>,'_blank','')" /></center>
 </p>
 <?
 	}

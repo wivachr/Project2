@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <?php
 require('mc_table.php');
 class PDF extends PDF_MC_Table
@@ -51,7 +53,10 @@ $pdf->AddPage();
  
 // กำหนดฟอนต์ที่จะใช้  อังสนา ตัวธรรมดา ขนาด 12
 $pdf->SetFont('angsana','',12);
- include('../connectdatabase.php'); 
+ include('../connectdatabase.php');
+ $teacher = (int)$teacher;
+ $y = mysqli_real_escape_string($connect, $y);
+ $s = mysqli_real_escape_string($connect, $s);
  	$sql = "select * from academicyear";
 	 $result = mysqli_query($connect, $sql);
 	 while($rs = mysqli_fetch_array($result))

@@ -1,7 +1,9 @@
-﻿<?php
+﻿<? session_start(); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
+<?php
 $key   = isset($_GET['key'])   ? $_GET['key']   : '';
 $ch    = isset($_GET['ch'])    ? $_GET['ch']    : '';
-$start = isset($_GET['start']) ? $_GET['start'] : 0;
+$start = isset($_GET['start']) ? (int)$_GET['start'] : 0;
 ?>
 <p>
   <input type="text" name="sexam" id="sexam" />

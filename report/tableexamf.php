@@ -1,11 +1,13 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || ($_SESSION['right']!='2' && $_SESSION['right']!='3')) { exit; } $t = (int)$t; ?>
 <?php
 require('mc_table.php');
 class PDF extends PDF_MC_Table
 {
 	//Override คำสั่ง (เมธอด) Header
 	function Header(){
- 	include('../connectdatabase.php'); 
+ 	include('../connectdatabase.php');
 	$sql = "select * from academicyear";
 	 $result = mysqli_query($connect, $sql);
 	 while($rs = mysqli_fetch_array($result))

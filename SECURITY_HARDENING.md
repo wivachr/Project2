@@ -54,6 +54,17 @@ A second independent read-only verification agent re-scanned the entire repo aga
 
 All 26 modified files verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (fourth pass)
+
+A third independent read-only verification agent, briefed to assume nothing and check every `mysqli_query()` call repo-wide by directory rather than by filename pattern, found one more entire family of the same bug sitting in the same directory as files already fixed in earlier passes:
+
+- `report/resulttitle.php`, `resulttitleall.php`, `result100.php`, `result100all.php`, `resulttitlepdf.php`, `resulttitlepdfall.php`, `result100pdf.php`, `result100pdfall.php` (8 files) — officer exam-result report pages with no auth and `$y`/`$s`/`$teacher` interpolated unescaped/uncast, plus reflected output in the "ออกรายงาน" button URLs. Same fix pattern applied.
+- `report/showtableexamfix.php`, `showtableexamfix-2.php`, `report/tableexamf.php` — teacher/officer exam-schedule-by-teacher report, no auth, `$t` interpolated unescaped. Gated to officer-or-teacher (`right IN ('2','3')`) since both roles legitimately use this (officer picks any teacher from a dropdown; a teacher views their own schedule via a session-derived value that was still client-resubmitted, so validated defensively) and cast `$t` to `(int)`.
+- `exam/showexam.php`, `teacher/showteacher.php`, `register/showregister.php`, `student/showstudent.php`, `project/showproject.php`, `project/showproject2.php` — officer listing pages with **no auth check at all** (full PII listings — student IDs/names, teacher phone/email — directly readable pre-login), plus the pagination parameter `$start` was concatenated raw into `LIMIT $start,$limit` in all of these and two more (`project/showallprojectteacher.php`, `project/showprojectteacher.php`) without ever being cast/escaped, even though the adjacent `$key` search parameter on the very same line always was. Added officer-only (or any-logged-in-user for the two teacher pages, which already had `session_start()` but no check) and `(int)$start` everywhere.
+- Deleted one more orphaned duplicate: `register/register - backup.php` (literal space in the filename, unreferenced, superseded by `register/register.php`).
+
+All 18 modified files (plus 1 more deletion) verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

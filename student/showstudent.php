@@ -18,6 +18,7 @@
  <? include('../connectdatabase.php');
   if(!isset($start)){ $start = 0; }
   if(!isset($key)){ $key = ''; }
+$key = mysqli_real_escape_string($connect, $key);
 $limit = '20'; // แสดงผลหน้าละกี่หัวข้อ
 $sql = mysqli_query($connect, "select * from student,title,faculty,department,division,curriculum where student.id_title=title.id_title and student.id_faculty=faculty.id_faculty and student.id_department=department.id_department and student.id_division=division.id_division and student.id_curr=curriculum.id_curr AND(student.id_student LIKE '%$key%' OR name_title LIKE '%$key%' OR name_student LIKE '%$key%' OR sname_student LIKE '%$key%' OR initials_division LIKE '%$key%' OR initials_department LIKE '%$key%' OR initials_faculty LIKE '%$key%' OR name_curr LIKE '%$key%')");
 $total = mysqli_num_rows($sql);

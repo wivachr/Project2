@@ -1,8 +1,20 @@
-﻿<? include('../change.php');
+﻿<? session_start(); ?>
+<? include('../change.php');
 	$type_file= pathinfo($_FILES['fileupload']['name'],PATHINFO_EXTENSION);
+	$idproject = (int)$idproject;
  ?>
 <?php
-if(strtolower($type_file)!="pdf")
+if(!isset($_SESSION['iduser']))
+{
+	?>
+	<script language="JavaScript">
+<!--
+window.parent.uploadfalse();
+//-->
+</script>
+	<?
+}
+else if(strtolower($type_file)!="pdf")
 {
 
 	?>
@@ -15,7 +27,21 @@ window.parent.uploadfalse();
 }
 else
 {
-include('../connectdatabase.php'); 
+include('../connectdatabase.php');
+	$owner = mysqli_query($connect, "select id_project from project where id_project='$idproject' AND id_user='".$_SESSION['iduser']."'");
+	if(mysqli_num_rows($owner)==0)
+	{
+		mysqli_close($connect);
+		?>
+		<script language="JavaScript">
+<!--
+window.parent.uploadfalse();
+//-->
+</script>
+		<?
+	}
+	else
+	{
 		  	$sql = "select * from academicyear";
 			 $result = mysqli_query($connect, $sql);
 			 while($rs = mysqli_fetch_array($result))
@@ -45,4 +71,4 @@ $dest = $dir."/" . $idproject.".pdf";
 window.parent.uploadok();
 //-->
 </script>
-<? } ?>
+<? } } ?>

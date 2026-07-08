@@ -17,6 +17,7 @@
  <? include('../connectdatabase.php');
  if(!isset($start)){ $start = 0; }
  if(!isset($key)){ $key = ''; }
+$key = mysqli_real_escape_string($connect, $key);
 $limit = '20'; // แสดงผลหน้าละกี่หัวข้อ
 $sql = mysqli_query($connect, "select project.id_project,project.name_project,exam.date_submitexam,typeexam.name_typeexam,statusproject.name_statusproject,comment_exam from exam,typeexam,project,statusproject where statusproject.id_statusproject=exam.id_statusproject AND exam.id_typeexam=typeexam.id_typeexam AND exam.id_project = project.id_project AND(project.name_project LIKE '%$key%' OR exam.date_submitexam LIKE '%$key%' OR typeexam.name_typeexam LIKE '%$key%' OR exam.id_statusproject LIKE '%$key%' OR project.id_project LIKE '%$key%')");
 $total = mysqli_num_rows($sql);

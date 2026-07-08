@@ -1,11 +1,25 @@
-﻿<? include('../change.php');
-	$type_file= pathinfo($_FILES['fileupload']['name'],PATHINFO_EXTENSION); ?>
+﻿<? session_start(); ?>
+<? include('../change.php');
+	$type_file= pathinfo($_FILES['fileupload']['name'],PATHINFO_EXTENSION);
+	$idproject = (int)$idproject;
+	$type_file = strtolower($type_file);
+ ?>
 <?php
-if($type_file!="pdf"&&$type_file!="PDF")
+if(!isset($_SESSION['right']) || $_SESSION['right']!='2')
 {
 	?>
 	<script language="JavaScript">
-	
+<!--
+window.parent.uploadfalse();
+//-->
+</script>
+	<?
+}
+else if($type_file!="pdf")
+{
+	?>
+	<script language="JavaScript">
+
 <!--
 window.parent.uploadfalse();
 //-->
@@ -14,7 +28,7 @@ window.parent.uploadfalse();
 }
 else
 {
-include('../connectdatabase.php'); 
+include('../connectdatabase.php');
 		  	$sql = "select * from academicyear";
 			 $result = mysqli_query($connect, $sql);
 			 while($rs = mysqli_fetch_array($result))
@@ -22,10 +36,9 @@ include('../connectdatabase.php');
 				$year = $rs[0];
 				$semester = $rs[1];
 			}
-			  mysqli_close($connect);
 $oldumask = umask(0);
 $dir = $year.'-'.$semester;
-mkdir('../'.$dir, 0777); // or even 01777 so you get the sticky bit set
+if (!is_dir('../'.$dir)) { mkdir('../'.$dir, 0777); }
 umask($oldumask);
 ?>
 
@@ -46,6 +59,7 @@ move_uploaded_file($_FILES['fileupload']['tmp_name'], $dest);
 $dest = $dir."/" . $idprojects.".pdf";
 	$sql = "update project set torgor_project='$dest' where id_project='$idproject'";
 	mysqli_query($connect, $sql);
+	mysqli_close($connect);
 ?>
 <script language="JavaScript">
 <!--

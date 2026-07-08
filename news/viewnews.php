@@ -1,6 +1,7 @@
 ﻿<?
-include('../change.php'); 
-include('../connectdatabase.php'); 
+include('../change.php');
+include('../connectdatabase.php');
+$id = (int)$id;
 $sql = "select * from news,user where id_news='$id' AND news.id_user=user.id_user";
 $result = mysqli_query($connect, $sql);
  while($rs = mysqli_fetch_array($result))
@@ -12,7 +13,7 @@ $result = mysqli_query($connect, $sql);
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<title><?=$rs[1]?></title>
+<title><?=htmlspecialchars($rs[1],ENT_QUOTES)?></title>
 <style type="text/css">
 body,td,th {
 	font-family: Tahoma, Geneva, sans-serif;
@@ -23,7 +24,7 @@ body,td,th {
 <body>
 <table width="735" height="169" border="1">
   <tr>
-    <th height="32" colspan="2" bgcolor="#CCCCCC" scope="col"><?=$rs[1]?></th>
+    <th height="32" colspan="2" bgcolor="#CCCCCC" scope="col"><?=htmlspecialchars($rs[1],ENT_QUOTES)?></th>
   </tr>
   <? if(!empty($rs[6])){ ?>
   <tr>
@@ -31,11 +32,11 @@ body,td,th {
   </tr>
   <? } ?>
   <tr>
-    <td height="109" colspan="2" valign="top" scope="row"><?=$rs[2]?></td>
+    <td height="109" colspan="2" valign="top" scope="row"><?=nl2br(htmlspecialchars($rs[2],ENT_QUOTES))?></td>
   </tr>
   <tr>
     <td width="141" valign="top" scope="row">วันที่เขียน : <?=$date2[2]."/".$date2[1]."/".$date2[0]?></td>
-    <td width="578" valign="top" scope="row">ผู้เขียน : <?=$rs[7]?> <?=$rs[8]?></td>
+    <td width="578" valign="top" scope="row">ผู้เขียน : <?=htmlspecialchars($rs[7],ENT_QUOTES)?> <?=htmlspecialchars($rs[8],ENT_QUOTES)?></td>
   </tr>
   <? if(!empty($rs[5])){ ?>
   <tr>

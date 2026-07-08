@@ -21,6 +21,7 @@
  <? include('../connectdatabase.php');
   if(!isset($start)){ $start = 0; }
   if(!isset($key)){ $key = ''; }
+$key = mysqli_real_escape_string($connect, $key);
 $limit = '10'; // แสดงผลหน้าละกี่หัวข้อ
 $joinsql = "from teacher
 left join title on teacher.id_title=title.id_title

@@ -17,6 +17,7 @@ $start = 0;
 }
 $limit = '10'; // แสดงผลหน้าละกี่หัวข้อ
 if(!isset($key)){ $key = ''; }
+$key = mysqli_real_escape_string($connect, $key);
 $sql = mysqli_query($connect, "select * from project,statusproject,committee,teacher where committee.position='ที่ปรึกษา' AND committee.id_project=project.id_project AND committee.id_teacher=teacher.id_teacher AND teacher.id_user='".$_SESSION['iduser']."' AND project.id_statusproject = statusproject.id_statusproject AND(project.id_project LIKE '%$key%' OR project.name_project LIKE '%$key%' OR statusproject.name_statusproject LIKE '%$key%') AND(project.id_statusproject <> '0' AND project.id_statusproject <> '17' AND project.id_statusproject <> '18' AND project.id_statusproject <> '16') order by project.id_project desc");
 $total = mysqli_num_rows($sql);
 $Query = mysqli_query($connect, "select * from project,statusproject,committee,teacher where committee.position='ที่ปรึกษา' AND committee.id_project=project.id_project AND committee.id_teacher=teacher.id_teacher AND project.id_statusproject = statusproject.id_statusproject AND teacher.id_user='".$_SESSION['iduser']."' AND (project.id_project LIKE '%$key%' OR project.name_project LIKE '%$key%' OR statusproject.name_statusproject LIKE '%$key%') AND(project.id_statusproject <> '0' AND project.id_statusproject <> '17' AND project.id_statusproject <> '18' AND project.id_statusproject <> '16')  order by project.id_project desc LIMIT $start,$limit"); //คิวรี่คำสั่ง

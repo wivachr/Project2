@@ -86,12 +86,15 @@ function checkYearProject(idstudent) {
       document.getElementById('regis').disabled = false;
       if (res.status === 'can_register_2nd') {
         box.className = 'notice-success';
-        box.innerHTML = '&#10004; พบโปรเจคปีเดิมที่ผ่านการสอบหัวข้อแล้ว &nbsp;|&nbsp; <b>ลงทะเบียนครั้งที่ 2</b><br/>โครงงาน: ' + res.data.name_project;
+        box.innerHTML = '&#10004; พบโปรเจคปีเดิมที่ผ่านการสอบหัวข้อแล้ว &nbsp;|&nbsp; <b>ลงทะเบียนครั้งที่ 2</b><br/>โครงงาน: ' + res.data.name_project
+          + '<br/>อาจารย์ที่ปรึกษา (ใช้คนเดิมจากครั้งที่ 1 อัตโนมัติ): <b>' + (res.data.advisor_name || '-') + '</b>';
         document.getElementById('parent_project_id').value = res.data.id_project;
         document.getElementById('nameproject').value    = res.data.name_project;
         document.getElementById('casestudy').value      = res.data.casestudy_project;
         document.getElementById('engnameproject').value = res.data.engname_project;
         document.getElementById('engcasestudy').value   = res.data.engcasestudy_project;
+        document.getElementById('idteacher').disabled = true;
+        document.getElementById('idteacher_note').style.display = 'inline';
       } else if (res.status === 'not_passed_yet') {
         box.className = 'notice-danger';
         box.innerHTML = '&#10006; ยังไม่สามารถลงทะเบียนครั้งที่ 2 ได้<br/>'
@@ -112,6 +115,8 @@ function resetYearProjectState() {
   document.getElementById('parent_project_id').value = '';
   document.getElementById('notice-box').style.display = 'none';
   document.getElementById('regis').disabled = false;
+  document.getElementById('idteacher').disabled = false;
+  document.getElementById('idteacher_note').style.display = 'none';
 }
 
 function onProjectTypeChange() {
@@ -149,7 +154,7 @@ function check() {
   if (f('engnameproject') == "") { highlight('engnameproject'); return false; }
   if (f('casestudy') != "" && f('engcasestudy') == "") { highlight('engcasestudy'); return false; }
   if (f('idstu1') == "")        { highlight('idstu1');    return false; }
-  if (document.getElementById('idteacher').value == 0) { highlight('idteacher'); return false; }
+  if (document.getElementById('parent_project_id').value == "" && document.getElementById('idteacher').value == 0) { highlight('idteacher'); return false; }
   if (f('email') == "")         { highlight('email');    return false; }
   if (f('address') == "")       { highlight('address');  return false; }
   if (f('password') == "")      { highlight('password'); return false; }
@@ -201,10 +206,34 @@ function clearre() {
         echo '<b style="color:#F00">ไม่สามารถลงทะเบียนโปรเจคปีครั้งที่ 2 ได้ — โปรเจคเดิมยังไม่ผ่านการสอบหัวข้อ</b>';
         echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
         $go = false;
+      } else {
+        $pchk = mysqli_query($connect, "select year_project,semester_project from project where id_project='$parent_project_id'");
+        $prow = mysqli_fetch_array($pchk);
+        if ($prow && $prow['year_project']==$year && $prow['semester_project']==$semester) {
+          echo '<b style="color:#F00">ยังไม่ถึงเวลาลงทะเบียนโปรเจค 2 ต้องรอภาคการศึกษาถัดไป</b>';
+          echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
+          $go = false;
+        }
       }
     }
 
     if ($go) {
+      // 2nd year-project registration reuses the parent's approved ทก.01 and skips the
+      // title-exam stage entirely, starting directly at "จัดส่งทก.01หลังการสอบหัวข้อเรียบร้อยแล้ว"
+      // (ready to submit for the 100% exam) -- matches project/registerproject2.php's behavior,
+      // so the two ways of creating a "project 2" no longer diverge.
+      $newStatus = '1';
+      $torgorProject = '';
+      $parentRow = null;
+      if ($parent_project_id !== null) {
+        $pResult = mysqli_query($connect, "select * from project where id_project='$parent_project_id'");
+        $parentRow = mysqli_fetch_array($pResult);
+        if ($parentRow) {
+          $newStatus = '6';
+          $torgorProject = mysqli_real_escape_string($connect, $parentRow['torgor_project']);
+        }
+      }
+
       $sql = "select max(id_project) from project where year_project = '$year' AND semester_project ='$semester'";
       $result = mysqli_query($connect, $sql);
       while($rs = mysqli_fetch_array($result)) {
@@ -226,7 +255,7 @@ function clearre() {
                project_type,parent_project_id,address_project,email_project,torgor_project,id_statusproject,id_user,
                engname_project,engcasestudy_project)
               VALUES('$id','$nameproject','$casestudy','$id_subject','$year','$semester','$sec',
-                     '$pt',$pid_sql,'$address','$email','','1','$iduser','$engnameproject','$engcasestudy')";
+                     '$pt',$pid_sql,'$address','$email','$torgorProject','$newStatus','$iduser','$engnameproject','$engcasestudy')";
       mysqli_query($connect, $sql);
 
       $sql = "select max(id_manipulator) from manipulator";
@@ -234,10 +263,33 @@ function clearre() {
       while($rs = mysqli_fetch_array($result)) { $idmanipulator = $rs[0]+1; }
       mysqli_query($connect, "insert into manipulator values('$idmanipulator','$idstu1','$id','$tel')");
 
-      $sql = "select max(id_committee) from committee";
-      $result = mysqli_query($connect, $sql);
-      while($rs = mysqli_fetch_array($result)) { $idcommittee = $rs[0]+1; }
-      mysqli_query($connect, "insert into committee values('$idcommittee','$idteacher','$id','ที่ปรึกษา')");
+      if ($parentRow) {
+        // round 2: carry the advisor + co-advisor over from the parent instead of the
+        // (disabled) form dropdown, since ทก.01 approval was tied to that committee
+        $cResult = mysqli_query($connect, "select * from committee where id_project='$parent_project_id' AND position='ที่ปรึกษา'");
+        while ($c = mysqli_fetch_array($cResult)) {
+          $r2 = mysqli_query($connect, "select max(id_committee) from committee");
+          $rs2 = mysqli_fetch_array($r2);
+          $idcommittee = $rs2[0]+1;
+          $parentTeacher = (int)$c['id_teacher'];
+          mysqli_query($connect, "insert into committee values('$idcommittee','$parentTeacher','$id','ที่ปรึกษา')");
+        }
+        $coResult = mysqli_query($connect, "select * from coadvisor where id_project='$parent_project_id'");
+        while ($co = mysqli_fetch_array($coResult)) {
+          $r2 = mysqli_query($connect, "select max(id_coadvisor) from coadvisor");
+          $rs2 = mysqli_fetch_array($r2);
+          $idcoadvisor = $rs2[0]+1;
+          $idtitle = (int)$co['id_title'];
+          $nname = mysqli_real_escape_string($connect, $co['name_coadvisor']);
+          $nsname = mysqli_real_escape_string($connect, $co['sname_coadvisor']);
+          mysqli_query($connect, "insert into coadvisor values('$idcoadvisor','$id','$idtitle','$nname','$nsname')");
+        }
+      } else {
+        $sql = "select max(id_committee) from committee";
+        $result = mysqli_query($connect, $sql);
+        while($rs = mysqli_fetch_array($result)) { $idcommittee = $rs[0]+1; }
+        mysqli_query($connect, "insert into committee values('$idcommittee','$idteacher','$id','ที่ปรึกษา')");
+      }
 
       $type_label = ($project_type === 'year') ? 'โปรเจคปี' : 'โปรเจคเทอม';
       $reg_num    = ($parent_project_id !== null) ? ' (ลงทะเบียนครั้งที่ 2)' : '';
@@ -323,6 +375,7 @@ function clearre() {
           mysqli_close($connect); ?>
         </select>
         *
+        <span id="idteacher_note" style="display:none; color:#888; font-size:11px;">(ลงทะเบียนครั้งที่ 2 ใช้อาจารย์ที่ปรึกษาคนเดิมอัตโนมัติ ไม่ต้องเลือกใหม่)</span>
       </th>
     </tr>
     <tr>

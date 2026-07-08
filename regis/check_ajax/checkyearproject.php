@@ -24,6 +24,18 @@ $q = "SELECT p.id_project, p.name_project, p.casestudy_project,
 $result = mysqli_query($connect, $q);
 if (mysqli_num_rows($result) > 0) {
     $rs = mysqli_fetch_array($result);
+    $parentId = $rs[0];
+
+    // advisor is carried over automatically for round 2 (not re-selected), so tell the UI who it is
+    $advisorName = '';
+    $aq = mysqli_query($connect, "SELECT initials_academictitle,name_teacher,sname_teacher
+        FROM committee,teacher,academictitle
+        WHERE committee.id_teacher=teacher.id_teacher AND teacher.id_academictitle=academictitle.id_academictitle
+          AND committee.id_project='$parentId' AND committee.position='ที่ปรึกษา' LIMIT 1");
+    if ($ars = mysqli_fetch_array($aq)) {
+        $advisorName = $ars[0].$ars[1]." ".$ars[2];
+    }
+
     echo json_encode([
         'status'  => 'can_register_2nd',
         'data'    => [
@@ -32,6 +44,7 @@ if (mysqli_num_rows($result) > 0) {
             'casestudy_project'   => $rs[2],
             'engname_project'     => $rs[3],
             'engcasestudy_project'=> $rs[4],
+            'advisor_name'        => $advisorName,
         ]
     ]);
     mysqli_close($connect);

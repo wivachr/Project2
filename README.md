@@ -16,6 +16,7 @@
 - [SITE_STRUCTURE.md](SITE_STRUCTURE.md) — แผนผัง navigation เต็มรูปแบบของทั้ง 4 portal (เมนูไหนโหลด fragment ไหน)
 - [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md) — รายงานตรวจสอบปัญหาที่พบและแก้ไขทั้งหมด
 - [UBUNTU_MIGRATION.md](UBUNTU_MIGRATION.md) — แผนเตรียมย้ายระบบจาก Windows/XAMPP ไปยัง Ubuntu server
+- [PROJECT_TYPES.md](PROJECT_TYPES.md) — โครงสร้าง/ดาต้าเบส/ลอจิกของโปรเจคเทอม vs โปรเจคปี
 
 ## การติดตั้งและรัน
 

@@ -11,6 +11,7 @@ See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and
 - DB: MySQL via XAMPP, database name check via phpMyAdmin
 - No build step — plain PHP files served directly
 - The `zip` PHP extension must be enabled in `php.ini` (then restart Apache) for `.xlsx` import features (`xlsxreader.php`)
+- `short_open_tag` must be `On` in php.ini — 258 files use bare `<? ... ?>` tags. XAMPP defaults to `On`; Ubuntu/Debian defaults to `Off`, which makes every page print raw PHP source instead of running it. See `UBUNTU_MIGRATION.md` §0
 
 ## Repository
 - GitHub: https://github.com/wivachr/Project2.git

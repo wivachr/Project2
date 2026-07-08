@@ -13,6 +13,7 @@ See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and
 - Credentials in `connectdatabase.php`: root / (no password)
 - No build step, no package manager, no test suite
 - The `zip` PHP extension must be enabled (`extension=zip` in `php.ini`, then restart Apache) — required by `xlsxreader.php` for parsing `.xlsx` uploads via `ZipArchive`
+- **`short_open_tag` must be `On`** — 258 files use bare `<? ... ?>` instead of `<?php ... ?>`. XAMPP defaults this to `On`, but Ubuntu/Debian's default php.ini ships with it `Off`; on a fresh Ubuntu deploy this makes every page print raw PHP source as text instead of executing it. See `UBUNTU_MIGRATION.md` §0.
 
 ## Architecture
 

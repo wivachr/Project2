@@ -156,13 +156,14 @@ body,td,th {
 			  $result = mysqli_query($connect, $sql);
 			  while($rs3 = mysqli_fetch_array($result))
 			  {
-				  $master = $rs3[8]."".$rs3[6]." ".$rs3[7];
+				  $master = $rs3[18]."".$rs3[7]." ".$rs3[8];
 			  }
+			   $gum = array();
 			   $sql = "select * from committee,teacher,academictitle where teacher.id_academictitle = academictitle.id_academictitle AND  committee.id_teacher=teacher.id_teacher AND id_project='".$rs[0]."' AND position='กรรมการ'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs3 = mysqli_fetch_array($result))
 			  {
-				  $gum = $rs3[8]."".$rs3[6]." ".$rs3[7];
+				  $gum[] = $rs3[18]."".$rs3[7]." ".$rs3[8];
 			  }
 			  $coad = "-";
 			  $sql = "select * from coadvisor,title where title.id_title=coadvisor.id_title AND id_project='".$rs[0]."'";
@@ -291,7 +292,7 @@ body,td,th {
       <td><? if($coad==""){echo "-";}else{echo $coad;}?></td>
     </tr>
   </table>
-  <table width="100%" border="0">
+  <table width="50%" border="0">
     <tr>
       <td colspan="2" height="10"></td>
     </tr>
@@ -302,7 +303,7 @@ body,td,th {
   </table>
 </div>
 <div id="apDiv4" align="center">
-  <h3><strong>แบบเสนอสอบหัวข้อโครงงานพิเศษ(ปริญญานิพนธ์)</strong></h3>
+  <h3><strong>แบบเสนอขอสอบโครงงานพิเศษ</strong></h3>
   <h3><strong>ภาควิชาเทคโนโลยีสารสนเทศ</strong></h3>
   <h3><strong>คณะเทคโนโลยีและการจัดการอุตสาหกรรม</strong></h3>
 </div>
@@ -340,12 +341,17 @@ body,td,th {
      ) </p>
  </center>
  </div>
-<div id="apDiv9" class="F12"> 
-  <p><span class="font"><span class="F12">ประธาน ______________________________<br />
+<div id="apDiv9" class="F12">
+  <p style="text-align:left"><span class="font"><span class="F12">&nbsp;&nbsp;&nbsp;ประธาน&nbsp;&nbsp;<?=($master!=""?$master:"______________________________")?><br />
   </span></span></p>
-  <p><span class="F12">    กรรมการ _____________________________</span></p>
-  <p><span class="F12">กรรมการ _____________________________ </span></p>
-  <p><span class="F12">กรรมการ _____________________________</span></p>
+  <? if(count($gum)>0) { foreach($gum as $g) { ?>
+  <p style="text-align:left"><span class="F12">&nbsp;&nbsp;&nbsp;กรรมการ&nbsp;&nbsp;<?=$g?></span></p>
+  <? } } else { ?>
+  <p style="text-align:left"><span class="F12">&nbsp;&nbsp;&nbsp;กรรมการ&nbsp;&nbsp;_____________________________</span></p>
+  <p style="text-align:left"><span class="F12">&nbsp;&nbsp;&nbsp;กรรมการ&nbsp;&nbsp;_____________________________ </span></p>
+  <p style="text-align:left"><span class="F12">&nbsp;&nbsp;&nbsp;กรรมการ&nbsp;&nbsp;_____________________________</span></p>
+  <? } ?>
+  <p>&nbsp;</p>
   <p><span class="F12">วันที่สอบ ............/.............../...............<br />
   </span></p>
   <p><span class="F12">    สถานที่จัดสอบ ................................</span><br />

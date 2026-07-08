@@ -25,6 +25,11 @@ body,td,th {
   <tr>
     <th height="32" colspan="2" bgcolor="#CCCCCC" scope="col"><?=$rs[1]?></th>
   </tr>
+  <? if(!empty($rs[6])){ ?>
+  <tr>
+    <td colspan="2" valign="top" align="center" scope="row"><img src="<?=htmlspecialchars($rs[6],ENT_QUOTES)?>" style="max-width:700px" /></td>
+  </tr>
+  <? } ?>
   <tr>
     <td height="109" colspan="2" valign="top" scope="row"><?=$rs[2]?></td>
   </tr>

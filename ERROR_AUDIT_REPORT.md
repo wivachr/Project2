@@ -73,6 +73,15 @@ Beyond code fixes, this session made the following live database changes:
 
 **27 blank-name `project` rows** remain intentionally untouched — linked to real `user` accounts via the actual registration flow, flagged for the project owner's review rather than deleted unilaterally.
 
+**Later session — schema/feature additions:**
+- `news.image_news VARCHAR(150)` added — optional image attachment for news announcements, alongside the existing `pdf_news`. Uploaded via new `news/uploadnewsimage.php` (mirrors `news/uploadnews.php`'s hidden-iframe pattern), displayed in `news/shownews.php` (thumbnail), `news/viewnews.php` (full image), and `index.php` (public list link).
+- `project/registerproject2.php` was missing `session_start()` entirely, so its `$_SESSION['iduser']` ownership filter never actually worked — anyone who knew/guessed a project ID could trigger project-2 registration for it. Fixed by adding `session_start()` and an explicit ownership check (`$parent['id_user']!=$_SESSION['iduser']` → reject).
+- Added a same-semester registration guard to `registerproject2.php`: blocks registering project 2 until the academic year/semester has actually advanced past the parent project's own `year_project`/`semester_project`.
+- Fixed `report/chooseeva.php`, `chooseeva2.php`, `chooseeva3.php` showing a permanently-blank "สถานะโครงงาน" — they read `$rs[15]` (`project.parent_project_id`) instead of `$rs[17]` (`statusproject.name_statusproject`) from a `select * from project,statusproject` join.
+- Fixed `report/evaluationform3.php`/`evaluationform3-2.php` throwing "Undefined array key 1" for single-author projects (`$nstudent[1]` referenced without an `isset()` guard, same recurring bug class as elsewhere in this report).
+- Added `report/evaluationform4.php` — a new print form for the external co-advisor's evaluation survey (10-item satisfaction questionnaire, distinct from the internal committee's scoring rubric used by `evaluationform3.php`), wired into `report/big3.php`'s co-advisor iframe. Built using normal document flow instead of the fragile `position:absolute` pattern the sibling forms use.
+- `report/formsubmittitleexam.php` and `report/formsubmit100exam.php` had print-pagination bugs (content spilling onto a spurious near-blank second page, and an "ลงชื่อ...(ผู้ยื่นคำร้อง)" signature line overlapping the results-grid border) — fixed via `@page { size: A4; margin: 5mm; }`, removing redundant/duplicate signature-date lines, and re-tuning a couple of `position:absolute` offsets. See the "Print-Form Templates" and "TH SarabunPSK Font" notes in `CLAUDE.md` for the verification approach and a known local-testing blind spot (the font isn't installed on the dev machine, which can produce false-positive wrapping issues).
+
 ## Testing methodology notes
 
 Fatal-error and warning sweeps were done via direct unauthenticated `GET` requests (no session, no POST body) to every `.php` file. This means:

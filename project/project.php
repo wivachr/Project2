@@ -651,6 +651,11 @@ if(mysqli_num_rows($result)!=0)
       <input type="button" id="btnsubmit100exam" value="ยื่นสอบร้อย%" onclick="submit100exam()"/>
       <? } ?>
       </div>
+      <div id="s4" style="margin-top:15px">
+      <? if($rs[10]=='11') { ?>
+      <input type="button" id="btnprint100exam" value="พิมพ์ใบยื่นสอบร้อย%" onClick="window.open('report/formsubmit100exam.php', '_blank', '')"/>
+      <? } ?>
+      </div>
       </td>
     </tr>
   </table>
@@ -658,8 +663,6 @@ if(mysqli_num_rows($result)!=0)
    			}
 			  mysqli_close($connect);
 	?>
-<br/>
-<div class="left" style="font-size:11px; color:#666; padding: 4px 8px;">*หมายเหตุ ควรตั้งขอบกระดาษ Top=8, Bottom=8, Left=9, Right=8 ส่วน Header &amp; Footer ให้เลือก Empty ให้หมด ก่อนสั่งพิมพ์</div>
-</div><!-- /main-wrap -->
+<br/></div><!-- /main-wrap -->
 </body>
 </html>

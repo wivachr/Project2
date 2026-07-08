@@ -66,7 +66,7 @@
 <table border="0" align="center" >
   <tr>
           <th align="right" valign="top" nowrap="nowrap" scope="col">สถานะโครงงาน :</th>
-          <td align="left"><?=$rs[15]?></td>
+          <td align="left"><?=$rs[17]?></td>
         </tr>
         <tr>
           <th align="right" valign="top" nowrap="nowrap" scope="col">ชื่อโครงงาน :</th>
@@ -165,7 +165,6 @@
   </p>
   <br/>
   <br/>
-  <p align="left">&nbsp;*หมายเหตุควรตั้งขอบกระดาษTop=8,Bottom=8,Left=9,Right=8ตรงส่วนHeader&Footerให้เลือกEmptyให้หมด ก่อนสั่งพิมพ์</p>
 </form>
 </body>
 </html>

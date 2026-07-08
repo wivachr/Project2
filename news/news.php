@@ -65,6 +65,10 @@ function add()
 			{
 				startUpload();
 			}
+			if ( document.getElementById('fileuploadimage').value.length > 0 )
+			{
+				startUploadImage();
+			}
 			$("#listnews").load("news/shownews.php?pop="+popsrt);
 		}
 		else
@@ -84,6 +88,14 @@ function startUpload()
 	document.getElementById('upmsg').innerHTML = "";
 	document.getElementById('btnUpload').disabled = true ;
 	document.getElementById('frmUpload').submit();
+}
+function startUploadImage()
+{
+	document.getElementById('frmUploadImage').action = "news/uploadnewsimage.php?idnews="+idnews;
+	document.getElementById('upmsgimg').style.color="";
+	document.getElementById('upmsgimg').innerHTML = "";
+	document.getElementById('btnUploadImage').disabled = true ;
+	document.getElementById('frmUploadImage').submit();
 }
 function clickupload()
 {
@@ -119,6 +131,44 @@ function uploadok()
 	document.getElementById('upmsg').innerHTML = 'อัพโหลดไฟล์สำเร็จ' ;
 	document.getElementById('btnUpload').disabled = false;
 	document.getElementById('frmUpload').reset() ;
+	var popsrt = Math.random();
+	$("#listnews").load("news/shownews.php?pop="+popsrt);
+	return true ;
+}
+function clickuploadimage()
+{
+	if ( document.getElementById('fileuploadimage').value.length == 0 )
+	{
+		alert( 'ระบุ File ที่จะ Upload' ) ;
+		return false ;
+	}
+	if(!idnews)
+	{
+		alert( 'กรุณาเพิ่มหรือเลือกข่าวสารก่อนอัพโหลดไฟล์' ) ;
+		return false ;
+	}
+	document.getElementById('frmUploadImage').action = "news/uploadnewsimage.php?idnews="+idnews;
+	document.getElementById('upmsgimg').style.color="";
+	document.getElementById('upmsgimg').innerHTML = "";
+	document.getElementById('btnUploadImage').disabled = true ;
+	return true ;
+}
+function uploadfalseimg()
+{
+	document.getElementById('fileuploadimage').value ="";
+	document.getElementById('upmsgimg').style.color="#FF6666";
+	document.getElementById('upmsgimg').innerHTML = 'กรุณาอัพโหลดไฟล์รูปภาพ (jpg, png, gif)' ;
+	document.getElementById('btnUploadImage').disabled = false;
+	document.getElementById('frmUploadImage').reset() ;
+	return true ;
+}
+function uploadokimg()
+{
+	document.getElementById('fileuploadimage').value ="";
+	document.getElementById('upmsgimg').style.color="green";
+	document.getElementById('upmsgimg').innerHTML = 'อัพโหลดรูปภาพสำเร็จ' ;
+	document.getElementById('btnUploadImage').disabled = false;
+	document.getElementById('frmUploadImage').reset() ;
 	var popsrt = Math.random();
 	$("#listnews").load("news/shownews.php?pop="+popsrt);
 	return true ;
@@ -239,6 +289,10 @@ function edit()
 			{
 				startUpload();
 			}
+			if ( document.getElementById('fileuploadimage').value.length > 0 )
+			{
+				startUploadImage();
+			}
 			$("#listnews").load("news/shownews.php?pop="+popsrt);
 		}
 		else
@@ -280,6 +334,17 @@ function cleardata()
                 <input type="submit" id="btnUpload" name="btnUpload" value="อัพโหลด PDF" style="display:none"/>
                 </form>
                 <span id="upmsg"></span>
+              </td>
+            </tr>
+            <tr>
+              <td align="right" valign="top">รูปภาพประกอบข่าวสาร :</td>
+              <td align="left">
+                <iframe id="uploadtargetimg" name="uploadtargetimg" src="" style="width:0px;height:0px;border:0"></iframe>
+                <form id="frmUploadImage" action="" method="post" enctype="multipart/form-data" onsubmit="return clickuploadimage();" target="uploadtargetimg">
+                <input id="fileuploadimage" name="fileuploadimage" type="file" accept="image/*">
+                <input type="submit" id="btnUploadImage" name="btnUploadImage" value="อัพโหลดรูปภาพ" style="display:none"/>
+                </form>
+                <span id="upmsgimg"></span>
               </td>
             </tr>
             <tr>

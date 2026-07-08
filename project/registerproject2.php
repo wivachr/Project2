@@ -1,3 +1,4 @@
+<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
 include('../connectdatabase.php');
@@ -11,9 +12,19 @@ $parent = mysqli_fetch_array($result);
 
 $dup = mysqli_query($connect, "select id_project from project where parent_project_id='$idproject' limit 1");
 
+$sql = "select * from academicyear";
+$result = mysqli_query($connect, $sql);
+$ay = mysqli_fetch_array($result);
+$newyear = $ay[0];
+$newsemester = $ay[1];
+
 if(!$parent)
 {
 	echo 'ERR|ไม่พบโครงงานต้นฉบับ';
+}
+else if(!isset($_SESSION['iduser']) || $parent['id_user']!=$_SESSION['iduser'])
+{
+	echo 'ERR|ไม่มีสิทธิ์ลงทะเบียนโปรเจค 2 สำหรับโครงงานนี้';
 }
 else if($parent['project_type']!=='year' || !empty($parent['parent_project_id']) || !in_array($parent['id_statusproject'], $passedIn))
 {
@@ -23,14 +34,12 @@ else if(mysqli_num_rows($dup)>0)
 {
 	echo 'ERR|โครงงานนี้ลงทะเบียนโปรเจค 2 ไปแล้ว';
 }
+else if($parent['year_project']==$newyear && $parent['semester_project']==$newsemester)
+{
+	echo 'ERR|ยังไม่ถึงเวลาลงทะเบียนโปรเจค 2 ต้องรอภาคการศึกษาถัดไป';
+}
 else
 {
-	$sql = "select * from academicyear";
-	$result = mysqli_query($connect, $sql);
-	$ay = mysqli_fetch_array($result);
-	$newyear = $ay[0];
-	$newsemester = $ay[1];
-
 	$sql = "select max(id_project) from project where year_project='$newyear' AND semester_project='$newsemester'";
 	$result = mysqli_query($connect, $sql);
 	$rs = mysqli_fetch_array($result);

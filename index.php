@@ -199,10 +199,11 @@ body {
 			  {
 				  $date2 = explode("-", $rs[4]);
 			  $pdflink = !empty($rs[5]) ? " <a href='news/".htmlspecialchars($rs[5],ENT_QUOTES)."' target='_blank'>[PDF]</a>" : "";
+			  $imglink = !empty($rs[6]) ? " <a href='news/".htmlspecialchars($rs[6],ENT_QUOTES)."' target='_blank'>[รูปภาพ]</a>" : "";
 			  if($rs[0]%2==1)
-              echo "<tr bgcolor='#CCCCCC' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /> <a href='news/viewnews.php?id=$rs[0]' target='_blank'>$rs[1]</a>$pdflink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
+              echo "<tr bgcolor='#CCCCCC' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /> <a href='news/viewnews.php?id=$rs[0]' target='_blank'>$rs[1]</a>$pdflink$imglink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
 			  else
-              echo "<tr bgcolor='#E9E9E9' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /><a href='news/viewnews.php?id=$rs[0]' target='_blank'> $rs[1]</a>$pdflink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
+              echo "<tr bgcolor='#E9E9E9' align='left'><td><img src='image/icon_01new.gif' width='15' height='11' /><a href='news/viewnews.php?id=$rs[0]' target='_blank'> $rs[1]</a>$pdflink$imglink</td><td align='right'>$date2[2]/$date2[1]/$date2[0]</td></tr>";
 			  }
 			  ?>
       </table>

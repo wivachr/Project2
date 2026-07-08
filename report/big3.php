@@ -90,7 +90,7 @@ $scoad = "";
 	if($coad!="")
 	{
 ?>
-<iframe src="evaluationform3.php?id=<?=$id?>&namee=<?=urlencode($coad." ".$scoad)?>" width="750" height="1090" frameborder="0">
+<iframe src="evaluationform4.php?id=<?=$id?>" width="750" height="1090" frameborder="0">
 </iframe>
 <? } ?>
 <SCRIPT LANGUAGE="JavaScript">

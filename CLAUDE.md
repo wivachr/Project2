@@ -58,7 +58,7 @@ include('../change.php');
 - `project/` — core: submit/approve/assign committee/schedule exam/record results. `shows2–shows8.php` are list views for each exam workflow step.
 - `student/`, `teacher/`, `register/`, `race/` — CRUD modules for entities
 - `exam/` — edit/view exam schedule
-- `report/` — PDF generation (FPDF library in `report/`) and screen reports. `report/ex.php` and `report/jadoo.php` are unused FPDF demo files, not part of the app — ignore.
+- `report/` — PDF generation (FPDF library in `report/`) and screen reports. `report/ex.php` is an unused FPDF demo file, not part of the app — ignore. `report/jadoo.php` was **not** actually a demo file (that earlier characterization was wrong) — it was a real, orphaned, unauthenticated page that dumped every project's student names/IDs/phone numbers with unescaped output; deleted during the 2026-07 security hardening pass (see `SECURITY_HARDENING.md`).
 - `basicdata/` — lookup tables (faculty, title, type, room, etc.). `basicdata/branch.php` and its `add/del/edit` helpers are dead/orphaned — they reference `board`/`branch` DB tables that don't exist, and nothing links to them. Don't "fix" without first understanding what they were meant to become (see `ERROR_AUDIT_REPORT.md`).
 - `news/`, `user/`, `password/`, `year/`, `headofdepartment/` — small utility modules
 

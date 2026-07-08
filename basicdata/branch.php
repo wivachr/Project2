@@ -1,5 +1,7 @@
-﻿<? include('../change.php'); ?>
-              <? include('../connectdatabase.php'); 
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='1') { exit; } ?>
+              <? include('../connectdatabase.php');
 			  $sql = "select MIN(id_board) from board";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))

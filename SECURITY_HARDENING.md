@@ -88,6 +88,16 @@ A fifth independent sweep, specifically briefed to distinguish intentionally-pub
 
 All 32 modified files verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (seventh pass)
+
+A sixth independent sweep specifically re-verified all 32 files from the previous pass for correctness (role values re-derived independently from actual shell linkage, not trusted from the commit message) and found all of them correct — no regressions this time. It did find a few more of the same "container page missing auth" class, plus one genuinely serious mischaracterized file:
+
+- **`report/jadoo.php` — deleted, not fixed.** `CLAUDE.md` and `ERROR_AUDIT_REPORT.md` both described this as an "unused FPDF demo file," but it was actually a live, fully-functional page: no auth check, no `WHERE` clause (dumps every project regardless of status), and echoes student names/IDs/phone numbers with **no `htmlspecialchars()`** — both a PII-disclosure and a stored-XSS risk (project name/case-study fields are student-supplied). Confirmed zero code references anywhere in the app (only mentioned in the two docs, which were simply wrong about it). Deleted, and `CLAUDE.md`'s description corrected.
+- `basicdata/branch.php` — same missing-auth gap as its 11 already-fixed `basicdata/*.php` siblings, but this one was missed (it's separately documented as dead/orphaned code referencing nonexistent `board`/`branch` tables — per `CLAUDE.md`, not restructured, just given the same admin-only auth gate as its siblings for defense-in-depth consistency).
+- `report/showchoosetableexam.php`, `showresult100.php`, `showresulttitle.php`, `showstatusproject.php` — four more officer-only "choose a teacher" dropdown pages that feed into already-correctly-gated report pages; these four themselves had no auth check, disclosing the teacher roster (names + titles) unauthenticated. Gated officer-only.
+
+All 5 modified files (plus 1 deletion) verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

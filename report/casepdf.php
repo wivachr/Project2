@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <?php
 define('FPDF_FONTPATH','font/');
 require('mc_table.php');
@@ -49,8 +51,9 @@ $pdf->SetFont('angsana','',12);
 $pdf->SetWidths(array(10,75,105));
 $header=array('Country','Capital','Area (sq km)','Pop. (thousands)');
 
- include('../connectdatabase.php'); 
-
+ include('../connectdatabase.php');
+	 $y = mysqli_real_escape_string($connect, $y);
+	 $s = mysqli_real_escape_string($connect, $s);
 	 $sql = "select casestudy_project,name_project from project where casestudy_project <>'' AND year_project ='$y'  AND semester_project ='$s'";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)

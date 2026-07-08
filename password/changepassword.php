@@ -1,5 +1,6 @@
 ﻿<? session_start(); ?>
 <? include('../change.php'); ?>
+<? if(!isset($_SESSION['iduser'])) { exit; } ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -382,7 +383,7 @@ function add()
 	document.getElementById("renewpass").style.borderColor="";
 	document.getElementById('checkpass').innerHTML = "";
                   <? include('../connectdatabase.php'); 
-			  $sql = "select password from user  where id_user='".$_SESSION['iduser']."'";
+			  $sql = "select password from user  where id_user='".(int)$_SESSION['iduser']."'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {

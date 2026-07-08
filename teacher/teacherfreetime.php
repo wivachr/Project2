@@ -44,27 +44,21 @@ function save(year,m)
 	else
 	freeday = 5;
 	
-	//$sql = "insert into teacherfreetime values('$day','$time','$id')";
-	//$sql = "delete from teacherfreetime where id_teacher = '$id' AND day_freetime='$day' AND time_freetime='$time' ";
 	if(m==true)
 	{
-		qstr2 +="insert into teacherfreetime values("+encodeURIComponent(freeday)+","+encodeURIComponent(year.substring(1))+","+encodeURIComponent(editid)+");";
+		qstr2 += "I,"+freeday+","+year.substring(1)+";";
 	}
 	else
 	{
-		qstr2 +="delete from teacherfreetime where id_teacher = "+encodeURIComponent(editid)+" AND day_freetime="+encodeURIComponent(freeday)+" AND time_freetime="+encodeURIComponent(year.substring(1))+";";
+		qstr2 += "D,"+freeday+","+year.substring(1)+";";
 	}
-		//qstr += "&&id="+encodeURIComponent(editid);
-		//qstr += "&&day="+encodeURIComponent(freeday);
-		//qstr += "&&time="+encodeURIComponent(year.substring(1));
-		
 }
 function managefreetime()
 {
 		var popsrt = Math.random();
 	var  qstr ="teacher/mfreetime.php?pop="+popsrt;
-	qstr += "&&id="+encodeURIComponent(qstr2);
-	//alert(qstr);
+	qstr += "&&teacherid="+encodeURIComponent(editid);
+	qstr += "&&ops="+encodeURIComponent(qstr2);
 	$("#result").load(qstr);
 	alert("บันทึกข้อมูลเวลาว่างอาจารย์เสร็จเรีบร้อย");
 }

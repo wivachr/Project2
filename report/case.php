@@ -1,5 +1,10 @@
-﻿<? include('../change.php'); ?>
- <? include('../connectdatabase.php');
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<?
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	include('../connectdatabase.php');
+	$y = mysqli_real_escape_string($connect, $y);
+	$s = mysqli_real_escape_string($connect, $s);
 $sql = "select casestudy_project,name_project from project where casestudy_project <>'' AND year_project ='$y'  AND semester_project ='$s'";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)
@@ -28,7 +33,7 @@ $nnumna++;
 <tr><td colspan="3" bgcolor="#CCCCCC">&nbsp;</td></tr>
   </table>
 <p>
-  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/casepdf.php?y=<?=$y?>&s=<?=$s?>','_blank','')" /></center>
+  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/casepdf.php?y=<?=htmlspecialchars($y,ENT_QUOTES)?>&s=<?=htmlspecialchars($s,ENT_QUOTES)?>','_blank','')" /></center>
 </p>
 <?
 	}

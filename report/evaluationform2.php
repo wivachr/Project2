@@ -113,7 +113,8 @@ body,td,th {
 </head>
 
 <body  leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<? include('../connectdatabase.php'); 
+<? session_start(); if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $id = (int)$id; ?>
+<? include('../connectdatabase.php');
 
 	  $num = 0;
 	  $nnnum = 0;
@@ -330,7 +331,7 @@ body,td,th {
       <td align="center">……………………………….........................……………</td>
     </tr>
     <tr>
-      <td align="center">(<?=" ".$namee." "?>)</td>
+      <td align="center">(<?=" ".htmlspecialchars($namee,ENT_QUOTES)." "?>)</td>
     </tr>
     <tr>
       <td align="center">ผู้ประเมิน</td>

@@ -110,7 +110,8 @@ body,td,th {
 </head>
 
 <body  leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<? include('../connectdatabase.php'); 
+<? session_start(); if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $id = (int)$id; ?>
+<? include('../connectdatabase.php');
  $coad="";
 	  $scoad="";
 	  $teacher="";

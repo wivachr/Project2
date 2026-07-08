@@ -41,6 +41,19 @@ After the first two commits, a dedicated read-only verification agent re-scanned
 
 All 97 files across the three commits were verified with `php -l` (0 syntax errors).
 
+### Follow-up sweep (third pass)
+
+A second independent read-only verification agent re-scanned the entire repo again (including spot-checking already-"fixed" files for regressions) and found one more critical issue plus a cluster of endpoints outside the `add*/edit*/del*` naming pattern that neither audit had matched:
+
+- **Worse than the password-reset bug**: `teacher/mfreetime.php` took a client-supplied `id` parameter that was literally **raw SQL statement text** (built client-side in `teacher/teacherfreetime.php`'s JS as `"insert into teacherfreetime values(...)"` / `"delete from ... where ...;"` strings), split on `;`, and ran each piece straight through `mysqli_query()` — unauthenticated, arbitrary single-statement SQL execution (e.g. an attacker could send `UPDATE user SET password=md5('x'),id_right='1' WHERE username='...'`). Fixed by changing the JS to send structured, validated tokens (`"I,day,time;"` / `"D,day,time;"`) instead of SQL text, and rewriting `mfreetime.php` to parse and validate each token (action must be `I`/`D`, day/time cast to `(int)`) before building the query server-side, plus adding the officer-only auth check. `teacher/teacherfreetimelist.php` (the companion read endpoint) also had no auth and an unquoted `$id` in its `SELECT` — fixed.
+- `register/addregister.php`, `student/addstudent.php`, `teacher/addfreetime.php`, `teacher/addteacher.php` — these `add*.php` handlers were somehow skipped by both prior passes even though their `edit`/`del` siblings were fixed; same officer-only + escaping pattern applied.
+- Two dead backup files were **deleted** (not fixed) since nothing referenced them and PHP executes any `.php` file regardless of name, so they were live, unauthenticated SQL-injection endpoints sitting unused: `regis/registerproject_bk.php` (a stale pre-project_type-feature copy of `registerproject.php`) and `report/evaluationform_backup.php`/`evaluationform_old.php` (noted as dead in `ERROR_AUDIT_REPORT.md` but never removed).
+- `report/case.php`/`casepdf.php`, `report/fallpdf.php`/`fallproject.php`, `report/statusproject.php`/`tablestatusproject.php`/`tablestatusproject2.php`, `report/noexam2.php`/`shownoexam2.php` — officer report pages with no auth at all and `$y`/`$s`/`$teacher`/`$t` interpolated raw into SQL (plus reflected XSS in `case.php`/`fallproject.php`'s `onclick` URLs). Added officer-only checks and escaping/casting.
+- `report/evaluationform.php` and its 8 live variants (`-1`, `-2`, `2`, `2-1`, `2-2`, `3`, `3-2`, `4`) — the individual per-reviewer print forms embedded via iframe in `report/big*.php`. `big*.php` was already officer-gated in an earlier commit, but these files are directly reachable by URL on their own and had no auth and an unescaped/uncast `$id`. Added the same officer-only + `(int)$id` pattern; also wrapped the `$namee` (reviewer display name) echo in `htmlspecialchars()` in `evaluationform2.php`/`evaluationform3.php` for defense-in-depth.
+- `password/changepassword.php` (low severity) — had `session_start()` but no `isset($_SESSION['iduser'])` guard, and used `$_SESSION['iduser']` uncast in a `SELECT`.
+
+All 26 modified files verified with `php -l` (0 syntax errors).
+
 ## Not fixed — needs a manual step outside this repo
 
 **Session cookie hardening** (`session.cookie_httponly=1`, `session.cookie_samesite=Lax`) requires editing `C:\xampp\php\php.ini`, which is shared, machine-wide configuration affecting every site hosted under this XAMPP install, not just this repo — so it was intentionally left untouched rather than edited automatically. To apply it:

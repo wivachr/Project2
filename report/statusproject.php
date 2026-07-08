@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $teacher = (int)$teacher; ?>
 <?php
 define('FPDF_FONTPATH','font/');
 require('mc_table.php');

@@ -1,5 +1,7 @@
-﻿ <? include('../change.php'); ?>
- <? 	include('../connectdatabase.php'); 
+﻿ <? session_start(); ?>
+ <? include('../change.php'); ?>
+ <? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $teacher = (int)$teacher; ?>
+ <? 	include('../connectdatabase.php');
 	 $sql = "select project.id_project,name_project,name_statusproject from project,statusproject,committee where project.id_statusproject=statusproject.id_statusproject AND committee.id_project = project.id_project AND position='ที่ปรึกษา' AND id_teacher='$teacher' AND (statusproject.id_statusproject<>'0' AND statusproject.id_statusproject<>'16' AND statusproject.id_statusproject<>'18' AND statusproject.id_statusproject<>'17')";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)

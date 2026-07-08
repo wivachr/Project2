@@ -1,6 +1,8 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $t = (int)$t; ?>
 <h2>รายชื่อโครงงานที่ยังไม่ยื่นสอบร้อยเปอร์เซ็นต์เมื่อใก้ลครบกำหนด</h2>
- <? 	include('../connectdatabase.php'); 
+ <? 	include('../connectdatabase.php');
 	$sql = "select * from academicyear";
 	 $result = mysqli_query($connect, $sql);
 	 while($rs = mysqli_fetch_array($result))

@@ -1,4 +1,6 @@
-﻿<? include('../change.php'); ?>
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <?php
 require('mc_table.php');
 class PDF extends PDF_MC_Table
@@ -52,7 +54,9 @@ $pdf->AddPage();
 // กำหนดฟอนต์ที่จะใช้  อังสนา ตัวธรรมดา ขนาด 12
 $pdf->SetFont('angsana','',12);
 $pdf->SetWidths(array(8,25,70,25,40,25,25,30,35));
- include('../connectdatabase.php'); 
+ include('../connectdatabase.php');
+ $y = mysqli_real_escape_string($connect, $y);
+ $s = mysqli_real_escape_string($connect, $s);
  $sql = "select project.id_project,name_project,engname_project,casestudy_project,name_typeexam,date_assignexam,time_assignexam,name_room,endtime_assignexam,exam.id_statusproject from assignexam,room,exam,project,typeexam,committee where exam.id_typeexam='1' AND committee.id_project=project.id_project AND position = 'ที่ปรึกษา' AND assignexam.id_room=room.id_room AND assignexam.id_exam=exam.id_exam AND (exam.id_statusproject  = '22') AND exam.id_project=project.id_project AND typeexam.id_typeexam = exam.id_typeexam AND year_exam ='$y'  AND semester_exam ='$s'";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)

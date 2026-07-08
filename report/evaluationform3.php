@@ -117,7 +117,8 @@ body,td,th {
 </head>
 
 <body  leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<? include('../connectdatabase.php'); 
+<? session_start(); if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } $id = (int)$id; ?>
+<? include('../connectdatabase.php');
 
 	  $num = 0;
 	  $nnnum = 0;
@@ -389,7 +390,7 @@ body,td,th {
 <div id="apDiv11">
   <p align="center">
   ลงชื่อ …………………………………………………………………………<br />
-  ( <?=$namee?> )<br />
+  ( <?=htmlspecialchars($namee,ENT_QUOTES)?> )<br />
   หมายเหตุ:  คะแนนข้อที่ 8 จะให้อยู่ในดุลพินิจของอาจารย์ที่ปรึกษาแล้วแต่ความเหมาะสม  จะเป็นคะแนนที่ให้เพิ่มจาก 100 % </p>
 </div>
 <div id="apDiv12">วันที่ …………/…………/…………</div>

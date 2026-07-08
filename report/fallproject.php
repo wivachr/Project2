@@ -1,5 +1,10 @@
-﻿<? include('../change.php'); ?>
- <? include('../connectdatabase.php');
+﻿<? session_start(); ?>
+<? include('../change.php'); ?>
+<?
+	if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; }
+	include('../connectdatabase.php');
+	$y = mysqli_real_escape_string($connect, $y);
+	$s = mysqli_real_escape_string($connect, $s);
 $sql = "select project.id_project,name_project,engname_project,casestudy_project,name_typeexam,date_assignexam,time_assignexam,name_room,endtime_assignexam,exam.id_statusproject from assignexam,room,exam,project,typeexam,committee where exam.id_typeexam='1' AND committee.id_project=project.id_project AND position = 'ที่ปรึกษา' AND assignexam.id_room=room.id_room AND assignexam.id_exam=exam.id_exam AND (exam.id_statusproject  = '22') AND exam.id_project=project.id_project AND typeexam.id_typeexam = exam.id_typeexam AND year_exam ='$y'  AND semester_exam ='$s'";
 $result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)
@@ -180,7 +185,7 @@ while($rs = mysqli_fetch_array($result))
 <tr><td colspan="7" bgcolor="#CCCCCC">&nbsp;</td></tr>
   </table>
 <p>
-  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/fallpdf.php?y=<?=$y?>&s=<?=$s?>','_blank','')" /></center>
+  <center><input type="button" name="button" id="button" value="ออกรายงาน" onclick="window.open('report/fallpdf.php?y=<?=htmlspecialchars($y,ENT_QUOTES)?>&s=<?=htmlspecialchars($s,ENT_QUOTES)?>','_blank','')" /></center>
 </p>
 <?
 	}

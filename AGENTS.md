@@ -47,6 +47,7 @@ See `ERROR_AUDIT_REPORT.md` for a full audit of known issues, orphaned code, and
 - TH SarabunPSK (the font all print forms use) isn't installed on this dev machine, so local PDF/screenshot rendering falls back to a substitute font with different text-wrap behavior — don't treat a wrapping-only overlap found only in local rendering as confirmed without checking a real screenshot from a machine that has the font
 - `report/big3.php` embeds one `<iframe>` per reviewer (advisor/chair/committee/co-advisor) pointed at different print-form files — check its `if(...)` blocks too when changing what a specific reviewer type sees, not just the target file
 - News announcements support an optional image (`news.image_news`), uploaded via `news/uploadnewsimage.php` mirroring the existing PDF upload (`news/uploadnews.php`) pattern — always `!empty()`-check before rendering
+- Write endpoints that `insert` a "pending" row (e.g. `project/submit100exam.php`) don't guard against double-submit, so a double-click creates two duplicate rows — this then shows up as a *list* bug (the same project appearing twice in `project/shows2.php`) because that list JOINs on the duplicated child row, not because the list query is wrong. If a list shows unexplained duplicates, check for duplicate child rows before assuming the JOIN itself is broken
 
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` folders (academic year data), `*.sql`, `*.bak`, `*.log`

@@ -155,6 +155,9 @@ All the print forms above use `font-family: TH SarabunPSK`. This font is **not p
 ### News Announcements Support an Optional Image, Not Just a PDF
 `news.image_news varchar(150)` (added this session, alongside the pre-existing `news.pdf_news`) stores an optional image attachment, uploaded via the same hidden-iframe pattern as the PDF (`news/uploadnewsimage.php`, mirroring `news/uploadnews.php`). Displayed as a thumbnail in `news/shownews.php`, full-width in `news/viewnews.php`, and as a `[รูปภาพ]` link next to `[PDF]` in `index.php`'s public news list. Always `!empty()`-check before rendering — most existing news rows have `image_news IS NULL`.
 
+### Double-Submit Creates Duplicate "Pending" Rows That Then Duplicate List Rows
+`project/submit100exam.php` (and siblings like it) `insert into exam` unconditionally on every call, with no check for an already-existing pending row for the same project/exam type. A double-click or a retried request creates two near-identical `exam` rows (same `id_project`, `id_typeexam`, `id_statusproject='20'`). Since `project/shows2.php` (officer's "รับเรื่องการสอบ" list) does `select ... from project,exam,... where exam.id_statusproject='20' AND exam.id_project=project.id_project`, a duplicate pending `exam` row makes the **same project appear twice** in that list — the bug surfaces as a UI list-duplication issue, but the real cause is upstream (no dedupe guard on insert), not the list query itself. When a list shows unexpected duplicate rows for one entity, check whether a JOIN is fanning out over duplicate child rows before assuming the list query itself is wrong.
+
 ## Git Rules
 - `.gitignore` excludes: `25[0-9][0-9]-*/` academic year data folders, `*.sql`, `*.bak`, `*.log`
 - Never commit `connectdatabase.php` credential changes or DB dumps

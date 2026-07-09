@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <p>
   <input type="text" name="sexam" id="sexam" />
   <input type="button" name="searchex" id="searchex" value="ค้นหา" onclick="searchexamp();"/>

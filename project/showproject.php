@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <?php
 $key   = isset($_GET['key'])   ? $_GET['key']   : '';

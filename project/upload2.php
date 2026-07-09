@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? include('../change.php');
 	$type_file= pathinfo($_FILES['fileupload']['name'],PATHINFO_EXTENSION);
 	$idproject = (int)$idproject;

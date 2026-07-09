@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? include('../change.php'); ?>
 <? if(!isset($_SESSION['right']) || ($_SESSION['right']!='2' && $_SESSION['right']!='3')) { exit; } ?>
 <h2>รายชื่อนักศึกษาที่ยังไม่มีหัวข้อ</h2>

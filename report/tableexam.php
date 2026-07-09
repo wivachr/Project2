@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 require('mc_table.php');
 class PDF extends PDF_MC_Table

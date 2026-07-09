@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? include('../change.php'); ?>
 <? if(!isset($_SESSION['right']) || $_SESSION['right']!='2') { exit; } ?>
 <h2>ดูข้อมูลการสอบ</h2>

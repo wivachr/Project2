@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? include('../change.php'); ?>
 <?
 	if(!isset($idstu1) || trim($idstu1)==="" || empty($_SESSION["idproject"])) { exit; }

@@ -1,4 +1,4 @@
-﻿<?
+<?
 include('../change.php');
 include('../connectdatabase.php');
 $id = (int)$id;

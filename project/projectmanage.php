@@ -1,4 +1,4 @@
-﻿<script type="text/javascript">
+<script type="text/javascript">
 var idstudent;
 var keyp="";
 var start="0";

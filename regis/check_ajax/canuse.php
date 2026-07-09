@@ -1,4 +1,4 @@
-﻿<?
+<?
 	include('../../connectdatabase.php');
 	$idstudent = mysqli_real_escape_string($connect, $_GET["idstudent"]);
 	$sql = "select * from academicyear";

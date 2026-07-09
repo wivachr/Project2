@@ -1,4 +1,4 @@
-﻿<? session_start(); ?>
+<? session_start(); ?>
 <? include('../change.php'); ?>
 <? if(!isset($_SESSION['iduser'])) { exit; } ?>
 <h2>โครงงานพิเศษที่คุณเป็นที่ปรึกษา</h2>

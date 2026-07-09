@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="1">
     <tr>
       <td  align="center" bgcolor="#CCCCCC">หัวข้อข่าวสาร</td>

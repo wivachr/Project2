@@ -82,6 +82,31 @@ Beyond code fixes, this session made the following live database changes:
 - Added `report/evaluationform4.php` — a new print form for the external co-advisor's evaluation survey (10-item satisfaction questionnaire, distinct from the internal committee's scoring rubric used by `evaluationform3.php`), wired into `report/big3.php`'s co-advisor iframe. Built using normal document flow instead of the fragile `position:absolute` pattern the sibling forms use.
 - `report/formsubmittitleexam.php` and `report/formsubmit100exam.php` had print-pagination bugs (content spilling onto a spurious near-blank second page, and an "ลงชื่อ...(ผู้ยื่นคำร้อง)" signature line overlapping the results-grid border) — fixed via `@page { size: A4; margin: 5mm; }`, removing redundant/duplicate signature-date lines, and re-tuning a couple of `position:absolute` offsets. See the "Print-Form Templates" and "TH SarabunPSK Font" notes in `CLAUDE.md` for the verification approach and a known local-testing blind spot (the font isn't installed on the dev machine, which can produce false-positive wrapping issues).
 
+## Session — 2026-07-09 (live bug reports + data incident response)
+
+Reactive fixes driven by real screenshots/console errors from the officer/student portals in daily use, plus a production data-integrity incident found while investigating one of them.
+
+### Code fixes
+- **`project/project.php`** — `$statusproject` was only ever assigned inside the `while` loop over the student's own `project` rows; a student with no project row yet (or an empty/expired session) left it undefined, and the resulting PHP warning was injected into the middle of an inline `<script>` block, breaking jQuery's `.load()` with `Uncaught SyntaxError: Unexpected token '<'`. Defaulted `$statusproject = '0'` before the query, null-coalesced `$_SESSION['iduser']`, and added a friendly "session expired" / "no project yet, please register" message instead of a silent blank panel.
+- **`project/formeditproject.php`** — `$gum`, `$idgum`, `$idco`, `$idmaster` were only ever assigned inside their respective committee/co-advisor/chair query loops, so a project without a full committee assigned yet threw undefined-variable warnings. Defaulted them (`array()`/`''`) alongside the existing `$coad`/`$master` init, and fixed `if($gum!="")` → `if(!empty($gum))` since an empty array `!= ""` is actually `true` in PHP — the original undefined-variable warning had been silently keeping that condition working by accident.
+- **`project/assignexam2.php`** — `$t[]` (committee members excluding the advisor) was never initialized when a project has no ประธาน/กรรมการ assigned yet, so `$t[0]`/`$t[1]`/`$t[2]` threw undefined-array warnings inside the inline `<script>` block that defines `assigningex2()`. Same failure mode as `project/project.php`: the script never finished parsing, so the function was never defined, and clicking "จัดสอบ" threw `ReferenceError: assigningex2 is not defined`. Initialized `$t = array()` and defaulted indices 0–2 to `''`.
+- **`report/evaluationform3.php` / `evaluationform3-2.php`** — `$nstudent[1]` (second team member's name, used to label the score-table header) was referenced unguarded; single-author projects threw "Undefined array key 1" straight into the printed form. Defaulted with `?? ''`. Note: an earlier audit entry above claims this was already fixed — it wasn't (verified via `git log` on both files); this session is the actual fix.
+- **`regis/registerproject.php`** — see "Race-condition incident" below; hardened with a `GET_LOCK`/`RELEASE_LOCK` critical section, per-insert error checking, and rollback of the orphaned `user` row if the `project` insert fails.
+
+### Race-condition incident: orphaned registrations blocking all new sign-ups
+While repairing the `project/project.php` warning above for one student, traced their "no project found" down to real data corruption: `regis/registerproject.php` assigned both `id_project` and `id_user` via `select max(id)+1` with no locking and no `mysqli_query()` error checking. A batch of ~5 concurrent registrations collided:
+- 4 students ended up with a working `user` login but **no** `project` row at all (their insert lost the race and failed silently) — their submitted data was never persisted anywhere, unrecoverable.
+- 1 project (`691001`) ended up pointing at a `user.id_user` that itself had failed to insert (an orphaned FK) — repaired by repointing it to the correct existing login account.
+- Because `user.username` is unique and equals the project id by convention, the leftover orphaned accounts (`691002`–`691005`) then blocked **every subsequent registration** (`Duplicate entry '691002' for key 'username'`) until they were deleted — this was a live, site-wide outage, not just a display bug for one student.
+
+Fixed the root cause in `regis/registerproject.php` (see Code fixes above). Data repair: repointed `project.id_user` for `691001`; deleted the 4 orphaned `user` rows with no project data. The `student` master roster table was never touched by any of this.
+
+### Test-data cleanup
+At the project owner's request, deleted all `69xxxx`-prefixed projects (`691001`–`691003`, `692001` — placeholder/test registrations created while diagnosing the above) and everything downstream in FK-safe order: `assignexam` → `exam` → `committee` → `manipulator` → `projecthistory` → `project` → `user`. `student` table untouched throughout.
+
+### Administrative action
+Changed `academicyear` from `2569/2` back to `2569/1` at the project owner's request (direct `UPDATE`, mirroring `year/changeyear.php`'s own logic; skipped its unconditional `DELETE FROM teacherfreetime` since that table was already empty, making the outcome identical either way).
+
 ## Testing methodology notes
 
 Fatal-error and warning sweeps were done via direct unauthenticated `GET` requests (no session, no POST body) to every `.php` file. This means:

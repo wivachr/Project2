@@ -15,6 +15,7 @@
 - [AGENTS.md](AGENTS.md) — สรุปแบบย่อของ CLAUDE.md สำหรับ Codex/AI agent อื่น
 - [SITE_STRUCTURE.md](SITE_STRUCTURE.md) — แผนผัง navigation เต็มรูปแบบของทั้ง 4 portal (เมนูไหนโหลด fragment ไหน)
 - [ERROR_AUDIT_REPORT.md](ERROR_AUDIT_REPORT.md) — รายงานตรวจสอบปัญหาที่พบและแก้ไขทั้งหมด
+- [SYSTEM_ANALYSIS_AND_ROADMAP.md](SYSTEM_ANALYSIS_AND_ROADMAP.md) — วิเคราะห์ความเสี่ยงเชิงโครงสร้าง/ความปลอดภัย และ roadmap การพัฒนาต่อ
 - [UBUNTU_MIGRATION.md](UBUNTU_MIGRATION.md) — แผนเตรียมย้ายระบบจาก Windows/XAMPP ไปยัง Ubuntu server
 
 ## การติดตั้งและรัน

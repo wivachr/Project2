@@ -1039,6 +1039,10 @@ function saveco()
 			  $coad = "";
 			  $master = "";
 			  $teacher = "";
+			  $gum = array();
+			  $idgum = array();
+			  $idco = "";
+			  $idmaster = "";
 
 			  $sql = "select * from manipulator,student,title where title.id_title = student.id_title AND manipulator.id_student=student.id_student AND id_project='".$rs[0]."' order by id_manipulator";
 			  $result = mysqli_query($connect, $sql);
@@ -1268,7 +1272,7 @@ function saveco()
       </td>
       </tr>
       <? }
-	  if($gum!="")
+	  if(!empty($gum))
 	  {
 	  ?>
          <tr>

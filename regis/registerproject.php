@@ -205,6 +205,14 @@ function clearre() {
     }
 
     if ($go) {
+      // Serialize ID assignment + inserts across concurrent submissions to prevent
+      // the MAX(id)+1 race that silently duplicated/dropped registrations before.
+      $lockName = 'registerproject_id_assignment';
+      $lockRow = mysqli_fetch_assoc(mysqli_query($connect, "SELECT GET_LOCK('$lockName', 10) AS got"));
+      if (!$lockRow || $lockRow['got'] != 1) {
+        echo '<b style="color:#F00">ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง</b>';
+        echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
+      } else {
       $sql = "select max(id_project) from project where year_project = '$year' AND semester_project ='$semester'";
       $result = mysqli_query($connect, $sql);
       while($rs = mysqli_fetch_array($result)) {
@@ -217,33 +225,48 @@ function clearre() {
       while($rs = mysqli_fetch_array($result)) { $iduser = $rs[0]+1; }
 
       $name1 = "ผู้จัดทำโครงงานพิเศษรหัส ".$id;
-      mysqli_query($connect, "insert into user values('$iduser','$name1','','$id','$mdfive','4','1')");
+      $okUser = mysqli_query($connect, "insert into user values('$iduser','$name1','','$id','$mdfive','4','1')");
 
-      $pt      = mysqli_real_escape_string($connect, $project_type);
-      $pid_sql = ($parent_project_id !== null) ? "'$parent_project_id'" : "NULL";
-      $sql = "INSERT INTO project
-              (id_project,name_project,casestudy_project,id_subject,year_project,semester_project,section_project,
-               project_type,parent_project_id,address_project,email_project,torgor_project,id_statusproject,id_user,
-               engname_project,engcasestudy_project)
-              VALUES('$id','$nameproject','$casestudy','$id_subject','$year','$semester','$sec',
-                     '$pt',$pid_sql,'$address','$email','','1','$iduser','$engnameproject','$engcasestudy')";
-      mysqli_query($connect, $sql);
+      $okProject = false;
+      if ($okUser) {
+        $pt      = mysqli_real_escape_string($connect, $project_type);
+        $pid_sql = ($parent_project_id !== null) ? "'$parent_project_id'" : "NULL";
+        $sql = "INSERT INTO project
+                (id_project,name_project,casestudy_project,id_subject,year_project,semester_project,section_project,
+                 project_type,parent_project_id,address_project,email_project,torgor_project,id_statusproject,id_user,
+                 engname_project,engcasestudy_project)
+                VALUES('$id','$nameproject','$casestudy','$id_subject','$year','$semester','$sec',
+                       '$pt',$pid_sql,'$address','$email','','1','$iduser','$engnameproject','$engcasestudy')";
+        $okProject = mysqli_query($connect, $sql);
+      }
 
-      $sql = "select max(id_manipulator) from manipulator";
-      $result = mysqli_query($connect, $sql);
-      while($rs = mysqli_fetch_array($result)) { $idmanipulator = $rs[0]+1; }
-      mysqli_query($connect, "insert into manipulator values('$idmanipulator','$idstu1','$id','$tel')");
+      if ($okUser && $okProject) {
+        $sql = "select max(id_manipulator) from manipulator";
+        $result = mysqli_query($connect, $sql);
+        while($rs = mysqli_fetch_array($result)) { $idmanipulator = $rs[0]+1; }
+        mysqli_query($connect, "insert into manipulator values('$idmanipulator','$idstu1','$id','$tel')");
 
-      $sql = "select max(id_committee) from committee";
-      $result = mysqli_query($connect, $sql);
-      while($rs = mysqli_fetch_array($result)) { $idcommittee = $rs[0]+1; }
-      mysqli_query($connect, "insert into committee values('$idcommittee','$idteacher','$id','ที่ปรึกษา')");
+        $sql = "select max(id_committee) from committee";
+        $result = mysqli_query($connect, $sql);
+        while($rs = mysqli_fetch_array($result)) { $idcommittee = $rs[0]+1; }
+        mysqli_query($connect, "insert into committee values('$idcommittee','$idteacher','$id','ที่ปรึกษา')");
 
-      $type_label = ($project_type === 'year') ? 'โปรเจคปี' : 'โปรเจคเทอม';
-      $reg_num    = ($parent_project_id !== null) ? ' (ลงทะเบียนครั้งที่ 2)' : '';
-      echo '<b>ลงทะเบียนเสร็จเรียบร้อย ['.$type_label.$reg_num.']</b><br/>';
-      echo '<b>ชื่อผู้ใช้งานสำหรับเข้าสู่ระบบของท่านคือ '.$id.'</b><br/>';
-      echo "<br/><center><input type='button' value='ปิดหน้าจอ' onclick='window.close();' style='cursor:hand'></center>";
+        mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+
+        $type_label = ($project_type === 'year') ? 'โปรเจคปี' : 'โปรเจคเทอม';
+        $reg_num    = ($parent_project_id !== null) ? ' (ลงทะเบียนครั้งที่ 2)' : '';
+        echo '<b>ลงทะเบียนเสร็จเรียบร้อย ['.$type_label.$reg_num.']</b><br/>';
+        echo '<b>ชื่อผู้ใช้งานสำหรับเข้าสู่ระบบของท่านคือ '.$id.'</b><br/>';
+        echo "<br/><center><input type='button' value='ปิดหน้าจอ' onclick='window.close();' style='cursor:hand'></center>";
+      } else {
+        if ($okUser && !$okProject) {
+          mysqli_query($connect, "delete from user where id_user='$iduser'");
+        }
+        mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+        echo '<b style="color:#F00">เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง</b>';
+        echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
+      }
+      }
     }
     mysqli_close($connect);
     ?>

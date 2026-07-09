@@ -280,8 +280,8 @@ body,td,th {
       <td width="119" rowspan="2" align="center" valign="top">หมายเหตุ </td>
     </tr>
     <tr>
-      <td height="20" align="center" valign="top"><?=$nstudent[0]?></td>
-      <td align="center" valign="top"><?=$nstudent[1]?></td>
+      <td height="20" align="center" valign="top"><?=$nstudent[0] ?? ''?></td>
+      <td align="center" valign="top"><?=$nstudent[1] ?? ''?></td>
     </tr>
     <tr>
       <td width="299" valign="top">&nbsp;1.การศึกษาปัญหาและการวิเคราะห์ระบบงานเพื่อให้ทราบถึงปัญหาที่แท้จริงหรือการแสดงให้เห็นถึงแนวความคิดในการพัฒนาระบบใหม่</td>

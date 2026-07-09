@@ -1,6 +1,7 @@
 ﻿<? include('../change.php'); ?>
 	<? include('../connectdatabase.php'); 
 	$c = 0;
+	$t = array();
 	$sql = "select * from committee where id_project = '$id'  and position<>'ที่ปรึกษา'";
 	$result = mysqli_query($connect, $sql);
 	while($rs = mysqli_fetch_array($result))
@@ -8,6 +9,9 @@
 		$t[$c]=$rs[1];
 		$c+=1;
 	}
+	$t[0] = $t[0] ?? '';
+	$t[1] = $t[1] ?? '';
+	$t[2] = $t[2] ?? '';
 	?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

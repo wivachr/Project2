@@ -76,7 +76,7 @@ var idmaniedit;
 	  $("#idtitle").toggle();
 	  $("#titleco").toggle();
    		 });
-	      <? include('../connectdatabase.php'); 
+	      <? include('../connectdatabase.php');
 		  	$sql = "select * from academicyear";
 			 $result = mysqli_query($connect, $sql);
 			 while($rs = mysqli_fetch_array($result))
@@ -84,7 +84,8 @@ var idmaniedit;
 				$year = $rs[0];
 				$semester = $rs[1];
 			}
-	  		  $sql = "select * from project where id_user='".$_SESSION['iduser']."'";
+			$statusproject = '0';
+	  		  $sql = "select * from project where id_user='".($_SESSION['iduser'] ?? '')."'";
 			  $result = mysqli_query($connect, $sql);
 			  while($rs = mysqli_fetch_array($result))
 			  {
@@ -327,10 +328,17 @@ table.info-table tr:nth-child(even) { background: #f7f7f7; }
 <center>
     <h2>รายละเอียดโครงงานพิเศษของคุณ</h2>
 </center>
-      <? include('../connectdatabase.php'); 
+      <? include('../connectdatabase.php');
 	  $num = 0;
-	  		  $sql = "select * from project,statusproject where project.id_statusproject=statusproject.id_statusproject AND id_user='".$_SESSION['iduser']."'";
+	  if(empty($_SESSION['iduser'])) { ?>
+	  <p>เซสชันของคุณหมดอายุ กรุณา<a href="index.php" target="_top">เข้าสู่ระบบใหม่อีกครั้ง</a></p>
+	  <? }
+	  		  $sql = "select * from project,statusproject where project.id_statusproject=statusproject.id_statusproject AND id_user='".($_SESSION['iduser'] ?? '')."'";
 			  $result = mysqli_query($connect, $sql);
+			  $foundproject = mysqli_num_rows($result)>0;
+			  if(!empty($_SESSION['iduser']) && !$foundproject) { ?>
+			  <p>ยังไม่พบข้อมูลโครงงานพิเศษของคุณในระบบ กรุณาลงทะเบียนโครงงานพิเศษก่อน</p>
+			  <? }
 			  while($rs = mysqli_fetch_array($result))
 			  {
 			  $teacher = "";

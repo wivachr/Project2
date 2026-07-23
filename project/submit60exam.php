@@ -1,22 +1,54 @@
-﻿<? include('../change.php'); ?>
-<?
+<? session_start(); include('../change.php');
 	include('../connectdatabase.php');
+	/*
+	 * ยื่นสอบหกสิบเปอร์เซนต์ (typeexam=3). แข็งแกร่งขึ้นตามแพทเทิร์นเดียวกับ
+	 * project/submittitleexam.php -- ดูคำอธิบายเต็มในไฟล์นั้น. (หมายเหตุ: ปัจจุบัน project.php
+	 * ไม่มีปุ่มที่เรียก submit60exam() แล้ว ฟังก์ชันค้างอยู่ใน student.php เท่านั้น แต่ endpoint นี้
+	 * ยังยิงตรงได้ จึง hardening ให้ปลอดภัยเท่ากันไว้)
+	 */
+	$idproject = isset($idproject) ? (int)$idproject : 0;
+	$iduser    = isset($_SESSION['iduser']) ? (int)$_SESSION['iduser'] : 0;
+	$typeexam   = '3';
+	$poststatus = '7';
+
+	if($idproject<=0 || $iduser<=0){ echo 'คำขอไม่ถูกต้อง'; mysqli_close($connect); exit; }
+
 	$sql = "select * from academicyear";
-	 $result = mysqli_query($connect, $sql);
-	 while($rs = mysqli_fetch_array($result))
-	{
-		$year = $rs[0];
-		$semester = $rs[1];
-	}
-	$sql = "select max(id_exam) from exam";
 	$result = mysqli_query($connect, $sql);
-	while($rs = mysqli_fetch_array($result))
-	{
-		$id = $rs[0]+1;
+	while($rs = mysqli_fetch_array($result)){ $year = $rs[0]; $semester = $rs[1]; }
+
+	$lockName = 'exam_id_assignment';
+	$lockRow  = mysqli_fetch_assoc(mysqli_query($connect, "SELECT GET_LOCK('$lockName',10) AS got"));
+	if(!$lockRow || $lockRow['got'] != 1){ echo 'ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง'; mysqli_close($connect); exit; }
+
+	// (1) โครงงานต้องมีจริงและเป็นของผู้ใช้ที่ล็อกอิน
+	$own    = mysqli_query($connect, "select id_user from project where id_project='$idproject'");
+	$ownRow = $own ? mysqli_fetch_assoc($own) : null;
+	if(!$ownRow || (int)$ownRow['id_user'] !== $iduser){
+		mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+		echo 'ไม่พบโครงงาน หรือไม่มีสิทธิ์ยื่นสอบโครงงานนี้';
+		mysqli_close($connect); exit;
 	}
-	$sql = "insert into exam values('$id','$idproject','3','','20','','$year','$semester')";
-	mysqli_query($connect, $sql);
-	$sql = "update project set id_statusproject='7' where id_project='$idproject'";
-	mysqli_query($connect, $sql);
+
+	// (3) กันยื่นซ้ำ: ต้องไม่มีคำขอที่ยังค้าง (status 20) ของประเภทการสอบนี้อยู่แล้ว
+	$dup = mysqli_query($connect, "select id_exam from exam where id_project='$idproject' AND id_typeexam='$typeexam' AND id_statusproject='20' limit 1");
+	if($dup && mysqli_num_rows($dup)>0){
+		mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+		echo 'มีการยื่นสอบรายการนี้อยู่แล้ว';
+		mysqli_close($connect); exit;
+	}
+
+	$res = mysqli_query($connect, "select max(id_exam) from exam");
+	$row = mysqli_fetch_array($res);
+	$id  = (int)$row[0] + 1;
+
+	// (4) เช็คผล insert ก่อน แล้วจึงค่อยเดินสถานะ project
+	$ok = mysqli_query($connect, "insert into exam values('$id','$idproject','$typeexam','','20','','$year','$semester')");
+	if($ok){
+		mysqli_query($connect, "update project set id_statusproject='$poststatus' where id_project='$idproject'");
+	}
+	mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+	if(!$ok){ echo 'เกิดข้อผิดพลาด ไม่สามารถยื่นสอบได้ กรุณาลองใหม่อีกครั้ง'; }
+
 	mysqli_close($connect);
 ?>

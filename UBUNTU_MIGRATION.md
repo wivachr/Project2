@@ -47,7 +47,9 @@ ERROR 1292 (22007): Incorrect date value: '' for column 'date_submitexam' at row
    ```sql
    SELECT @@GLOBAL.sql_mode;
    ```
-2. **แนะนำอย่างยิ่ง: ตั้ง dev ให้ตรงกับ production** เพื่อให้บั๊กประเภทนี้โผล่ตั้งแต่ตอนพัฒนา แทนที่จะไปโผล่บนเครื่องจริง — แก้ `my.ini` ของ XAMPP (`[mysqld]` → `sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION`) แล้ว restart MySQL
+2. **ทำแล้ว: dev ถูกตั้งให้ตรงกับ production** — `C:\xampp\mysql\bin\my.ini` บรรทัด `sql_mode` เปลี่ยนเป็น `ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION` (ไฟล์เดิมสำรองไว้เป็น `my.ini.bak-*`) บั๊กประเภทนี้จึงพังตั้งแต่บนเครื่อง dev แล้ว ไม่ต้องรอไปเจอบนเซิร์ฟเวอร์ — `ONLY_FULL_GROUP_BY` ปลอดภัยเพราะโค้ดทั้งระบบไม่มี `GROUP BY` เลย
+
+   > การ restart MySQL ของ XAMPP: มันรันเป็น process ธรรมดา (ไม่ใช่ Windows service) และ `mysqladmin shutdown` จะหยุดรับ connection ได้จริงแต่ **process ค้างไม่ยอมจบและไม่เขียน log เพิ่ม** — เมื่อ connection ถูกปฏิเสธแล้วถือว่า shutdown เสร็จ force kill แล้วสั่ง `mysqld.exe --defaults-file=C:\xampp\mysql\bin\my.ini --standalone` ใหม่ได้ปลอดภัย (ตรวจ `CHECK TABLE` หลังทำแล้ว OK ทุกตาราง) หรือใช้ XAMPP Control Panel กด Stop → Start ก็เลี่ยงเรื่องนี้ได้ทั้งหมด
 3. ถ้าเจอฟีเจอร์อื่นพังหลังย้ายในลักษณะ "กดแล้วเงียบ/ไม่บันทึก" ให้สงสัย strict mode เป็นอันดับแรก แล้วไล่หา `insert`/`update` ที่ส่ง `''` ลงคอลัมน์ `date`/`int`
 
 > อย่าแก้ด้วยการปิด `STRICT_TRANS_TABLES` บน production เป็นทางแรก — มันกลบปัญหาอื่นที่ควรรู้ ทางที่ถูกคือไล่แก้ค่าที่ส่งเข้า DB ให้ถูกชนิด (ซึ่งเคสนี้ทำไปแล้ว)

@@ -107,6 +107,29 @@ At the project owner's request, deleted all `69xxxx`-prefixed projects (`691001`
 ### Administrative action
 Changed `academicyear` from `2569/2` back to `2569/1` at the project owner's request (direct `UPDATE`, mirroring `year/changeyear.php`'s own logic; skipped its unconditional `DELETE FROM teacherfreetime` since that table was already empty, making the outcome identical either way).
 
+## Session — 2026-07-23/24 ("เจ้าหน้าที่ไม่เห็นการยื่นสอบ" recurrence — full root-cause hunt)
+
+The "student submits a title/100% exam request but the officer's รับเรื่องการสอบ list never shows it" bug came back. Traced to **two** distinct defects, both in the three submit handlers, which had never been touched since the initial commit and were left out of the earlier ID-assignment hardening pass.
+
+### Defect 1 — unguarded insert + status advanced regardless (commit `7388927`)
+`project/submittitleexam.php`, `submit100exam.php`, `submit60exam.php` assigned `id_exam` via `select max(id_exam)+1` with no lock, never checked the `insert into exam` result, and ran `update project set id_statusproject=...` unconditionally afterward. Any failed insert (PK collision under concurrent submissions, or an empty/invalid `idproject` landing the row at `id_project=0`) left the project looking submitted with no `exam` row for `project/shows2.php` to join on — invisible to the officer. The same unguarded insert also produced duplicate pending rows on double-submit (the same project listed twice).
+
+Fixed on all three, mirroring `regis/registerproject.php`: `session_start()` + ownership check (project must exist and belong to the logged-in student — also closes an IDOR where anyone could submit for any project id), `GET_LOCK('exam_id_assignment',10)` around id-assignment+insert, a dedupe guard rejecting a second pending (status 20) row for the same exam type, and checking the insert result before advancing project status.
+
+### Defect 2 — `''` is not a valid DATE under MySQL 8.0 strict mode (commit `b4be774`) — the actual recurrence
+Production has been migrated to **Ubuntu + MySQL 8.0.46**, which enables `STRICT_TRANS_TABLES` + `NO_ZERO_DATE` by default. All three handlers inserted `''` into `exam.date_submitexam` (`date NOT NULL`). The XAMPP/MariaDB dev box (`sql_mode=NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION`, **no** `STRICT_TRANS_TABLES`) silently coerced that to `0000-00-00`; production rejects it outright with `ERROR 1292 (22007) Incorrect date value: '' for column 'date_submitexam'`. So **every** submission failed on the server — 100%, not intermittently — and (before Defect 1 was fixed) the status still advanced, giving exactly the reported symptom.
+
+Confirmed by importing a fresh production dump (generated 2026-07-24 02:34 from the Ubuntu box) into a scratch database: `CHECKSUM TABLE` on `project`, `exam`, and `user` matched the previous state exactly — **not one new `exam` row had been recorded**, consistent with every submission failing. The rejection was then reproduced directly by running the original INSERT under MySQL 8.0's default `sql_mode`.
+
+Fixed by writing a real Buddhist-era date (`$year` from `academicyear` + current month/day, the same format `project/approve*exam.php` already uses for this column) instead of `''`. No schema change required; the other five `insert ... ''` sites in the codebase target `varchar`/`text` columns, which strict mode accepts. Verified end-to-end over HTTP with the local server temporarily switched to production's exact `sql_mode`: submit inserts one row dated `2569-07-24` at status 20, advances the project to status 2, and the project appears in `shows2.php`; repeat-submit, wrong-owner, and unauthenticated calls are all rejected with no junk row created. All test data and the `sql_mode` change were reverted afterward.
+
+Documented in `UBUNTU_MIGRATION.md` §0.1 (the original migration audit missed `sql_mode` entirely) and `CLAUDE.md`.
+
+### Known residue not yet cleaned
+The live data still carries the historical fallout of Defect 1: `exam` rows with `id_project=0` (largely artifacts of the unauthenticated GET sweep described below, which used to create a junk row per call — the new guards make that impossible), and duplicate pending (status 20) rows for the same project+exam type. These are invisible-or-duplicated entries in the officer's list; cleaning them requires re-running the diagnostics against current production data rather than reusing any earlier row list, and previewing with `SELECT` before any `DELETE`.
+
+**Not yet deployed:** both fixes are committed locally only. Production keeps failing every submission until the updated `project/submit*exam.php` files are deployed to the Ubuntu server.
+
 ## Testing methodology notes
 
 Fatal-error and warning sweeps were done via direct unauthenticated `GET` requests (no session, no POST body) to every `.php` file. This means:

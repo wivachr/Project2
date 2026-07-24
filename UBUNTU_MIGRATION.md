@@ -24,6 +24,36 @@ sudo systemctl restart apache2
 
 ---
 
+## 0.1 [สำคัญมาก] `sql_mode` STRICT ของ MySQL 8.0 ทำให้การยื่นสอบล้มเงียบ ๆ
+
+**จุดที่ audit รอบแรกพลาดเช่นกัน และเกิดขึ้นจริงหลัง deploy** — โค้ดชุดนี้เขียนบนสมัยที่ MySQL ยังไม่บังคับ strict mode จึงมีการ `insert` ค่า `''` ลงคอลัมน์ที่ไม่ใช่ข้อความ
+
+- **XAMPP/MariaDB (dev)**: `sql_mode = NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION` — **ไม่มี** `STRICT_TRANS_TABLES` จึงยอมแปลง `''` เป็น `0000-00-00` ให้เงียบ ๆ
+- **Ubuntu/MySQL 8.0 (production)**: ค่าเริ่มต้นมี `STRICT_TRANS_TABLES` + `NO_ZERO_DATE` → **ปฏิเสธทันที**
+
+เคสจริง: `project/submittitleexam.php`, `submit100exam.php`, `submit60exam.php` เคย `insert into exam values(...,'',...)` ลง `exam.date_submitexam` (`date NOT NULL`) บน production จึงได้
+
+```
+ERROR 1292 (22007): Incorrect date value: '' for column 'date_submitexam' at row 1
+```
+
+ทำให้ **การยื่นสอบล้มทุกครั้ง 100%** (ไม่ใช่บางครั้ง) และเพราะโค้ดเดิมไม่เช็คผล `mysqli_query()` สถานะ project ก็ยังเดินหน้าต่อ → นักศึกษาเห็น "ยื่นสอบแล้ว" แต่ไม่มีแถวใน `exam` ให้ `project/shows2.php` join → **เจ้าหน้าที่ไม่เห็นการยื่นสอบเลย** หลักฐานยืนยัน: dump จาก production (2026-07-24) มี `CHECKSUM TABLE` ของ `project`/`exam`/`user` ตรงกับสถานะเดิมทุกประการ = ไม่มีแถว `exam` ใหม่เกิดขึ้นเลยนับจาก deploy
+
+**แก้ไปแล้วในโค้ด** (commit `b4be774`): เขียนวันที่จริงรูปแบบ พ.ศ. แบบเดียวกับ `project/approve*exam.php` แทน `''` — ไม่ต้องแก้ schema และ `insert ... ''` อีก 5 จุดที่เหลือในระบบล้วนลงคอลัมน์ `varchar`/`text` ซึ่ง strict mode ยอมรับอยู่แล้ว
+
+**สิ่งที่ควรทำเพิ่ม:**
+
+1. ตรวจ sql_mode จริงบนเครื่อง production:
+   ```sql
+   SELECT @@GLOBAL.sql_mode;
+   ```
+2. **แนะนำอย่างยิ่ง: ตั้ง dev ให้ตรงกับ production** เพื่อให้บั๊กประเภทนี้โผล่ตั้งแต่ตอนพัฒนา แทนที่จะไปโผล่บนเครื่องจริง — แก้ `my.ini` ของ XAMPP (`[mysqld]` → `sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION`) แล้ว restart MySQL
+3. ถ้าเจอฟีเจอร์อื่นพังหลังย้ายในลักษณะ "กดแล้วเงียบ/ไม่บันทึก" ให้สงสัย strict mode เป็นอันดับแรก แล้วไล่หา `insert`/`update` ที่ส่ง `''` ลงคอลัมน์ `date`/`int`
+
+> อย่าแก้ด้วยการปิด `STRICT_TRANS_TABLES` บน production เป็นทางแรก — มันกลบปัญหาอื่นที่ควรรู้ ทางที่ถูกคือไล่แก้ค่าที่ส่งเข้า DB ให้ถูกชนิด (ซึ่งเคสนี้ทำไปแล้ว)
+
+---
+
 ## 1. ติดตั้ง PHP extension ที่จำเป็น
 
 ```bash
@@ -141,6 +171,8 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
 ## Checklist หลังย้ายเครื่องเสร็จ (ทดสอบจริง)
 
 - [ ] เปิดหน้าแรก (`index.php`) แล้ว**ไม่เห็น PHP source code เป็นตัวหนังสือดิบ** (ยืนยันว่า `short_open_tag=On` มีผลจริงแล้ว — ดูข้อ 0 ด้านบน ทำเป็นอย่างแรกก่อนเช็คอย่างอื่นทั้งหมด)
+- [ ] **นักศึกษายื่นสอบหัวข้อ/ร้อย% แล้วเจ้าหน้าที่เห็นรายการใน "รับเรื่องการสอบ" จริง** — เทสต์นี้จับบั๊ก `sql_mode` STRICT (ข้อ 0.1) ที่ทำให้ยื่นสอบล้มเงียบ ๆ 100% หลังย้ายเครื่อง อย่าเช็คแค่ว่าหน้าจอนักศึกษาขึ้น "ยื่นสอบแล้ว" เพราะสถานะฝั่งนักศึกษาเดินหน้าได้แม้ insert จะล้ม
+- [ ] ตรวจ `SELECT @@GLOBAL.sql_mode;` บนเครื่องใหม่ และเทียบกับ dev (ดูข้อ 0.1)
 - [ ] Login ได้ทั้ง 4 สิทธิ์ (admin/officer/teacher/student)
 - [ ] อัปโหลดไฟล์ PDF (ทก.01, เล่มปริญญานิพนธ์, ข่าวประกาศ) สำเร็จ และไฟล์เขียนลงโฟลเดอร์ถูกต้อง
 - [ ] นำเข้าไฟล์ `.xlsx` (นักศึกษา/ลงทะเบียน) ทำงานได้

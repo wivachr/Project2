@@ -213,6 +213,30 @@ function clearre() {
         echo '<b style="color:#F00">ระบบไม่ว่าง กรุณาลองใหม่อีกครั้ง</b>';
         echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
       } else {
+      // Re-check inside the lock that this student has no active project this term.
+      // regis/check_ajax/canuse.php performs the same test, but only from client-side
+      // JS on blur -- nothing re-validated it server-side, so a double-clicked submit
+      // (both requests passing the check before either row existed), a bypassed blur,
+      // or a resubmitted form created a second project for the same student. That is
+      // how 691019/691020 and 691041/691042 ended up as duplicate registrations of the
+      // same team, each with the partner added as a member. Same statuses ignored as
+      // canuse.php: 0 (unset) and 18 (cancelled).
+      $stu_esc = mysqli_real_escape_string($connect, trim($idstu1));
+      $dupReg = mysqli_query($connect, "SELECT project.id_project FROM project,manipulator
+          WHERE project.id_project=manipulator.id_project
+            AND project.year_project='$year' AND project.semester_project='$semester'
+            AND project.id_statusproject<>'0' AND project.id_statusproject<>'18'
+            AND manipulator.id_student='$stu_esc' LIMIT 1");
+      if ($dupReg && mysqli_num_rows($dupReg) > 0) {
+        $d = mysqli_fetch_assoc($dupReg);
+        mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
+        echo '<b style="color:#F00">รหัสนักศึกษานี้มีการลงทะเบียนโครงงานในภาคเรียนนี้แล้ว (รหัสโครงงาน '.$d['id_project'].')</b>';
+        echo "<br/><input type='button' value='ย้อนกลับ' onclick='history.back();'/>";
+        mysqli_close($connect);
+        ?></td></tr></table><?
+        exit;
+      }
+
       $sql = "select max(id_project) from project where year_project = '$year' AND semester_project ='$semester'";
       $result = mysqli_query($connect, $sql);
       while($rs = mysqli_fetch_array($result)) {

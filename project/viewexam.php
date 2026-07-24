@@ -36,7 +36,7 @@ while($rs = mysqli_fetch_array($result))
       <tr>
         <td align="left" scope="row"><?=$rs[9]?></td>
         <td><? if($rs[3]=="0000-00-00"){echo "ยังไม่ได้ยื่นเรื่อง";}else{echo $rs[3];}?></td>
-        <td align="left"><?=$rs[25]?></td>
+        <td align="left"><?=$rs[27]?></td>
         <td align="left"><? if($rs[5]==""){echo "ไม่มีความคิดเห็น";}else{echo nl2br($rs[5]);}?></td>
       </tr>
     <?

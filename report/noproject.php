@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 	include('../connectdatabase.php'); 
 	$sql = "select * from academicyear";
@@ -27,18 +27,18 @@ class PDF extends PDF_MC_Table
 		$this->SetFont('angsana','B',16);
  
 		//พิมพ์ตัวหนังสือตัวเอียงๆ ที่ตำแหน่งเยื้องขอบกระดาษซ้าย 5หน่วย ขอบกระดาษบน 5หน่วย
-		$this->Text(60,10,iconv( 'UTF-8','cp874' ,"รายชื่อนักศึกษาที่ยังไม่มีหัวข้อประจำ ภาคเรียน ".$semester." ปีการศึกษา ".$year));
-		$this->Text(75,20,iconv( 'UTF-8','cp874' ,'คณะเทคโนโลยีและการจัดการอุตสาหกรรม'));
+		$this->Text(60,10,iconv( 'UTF-8','cp874//IGNORE' ,"รายชื่อนักศึกษาที่ยังไม่มีหัวข้อประจำ ภาคเรียน ".$semester." ปีการศึกษา ".$year));
+		$this->Text(75,20,iconv( 'UTF-8','cp874//IGNORE' ,'คณะเทคโนโลยีและการจัดการอุตสาหกรรม'));
   		$this->SetFont('angsana','',14);
 		$year2 = date('Y')+543;
-		$this->Text(10,10,iconv( 'UTF-8','cp874' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
+		$this->Text(10,10,iconv( 'UTF-8','cp874//IGNORE' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
 		$this->SetFont('angsana','B',16);
 		//ปัดบรรทัด กำหนดความกว้างของบรรทัด 20หน่วย
 		$this->Ln(20);
 		$this->SetFont('angsana','',12);
 $this->SetWidths(array(50,130));
 $this->SetAligns(array('C','C'));
-			$this->Row(array( iconv( 'UTF-8','cp874' ,"รหัสนักศึกษา"),iconv( 'UTF-8','cp874' ,"ชื่อ-สกุลนักศึกษา")));
+			$this->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,"รหัสนักศึกษา"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อ-สกุลนักศึกษา")));
 	$this->SetAligns(array('C','L'));
 	}
  
@@ -79,7 +79,7 @@ $result = mysqli_query($connect, $sql);
 
 while($rs = mysqli_fetch_array($result))
 {
-				$pdf->Row(array( iconv( 'UTF-8','cp874' ,$rs[1]),iconv( 'UTF-8','cp874' ,$rs[0].$rs[2]." ".$rs[3]))); 
+				$pdf->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,$rs[1]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[0].$rs[2]." ".$rs[3]))); 
 }
 	}
 $pdf->Output();

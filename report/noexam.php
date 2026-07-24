@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 	include('../connectdatabase.php'); 
 	$sql = "select * from academicyear";
@@ -37,17 +37,17 @@ $pdf->AddPage();
 $pdf->SetFont('angsana','',12);
 $pdf->SetWidths(array(50,130));
 $pdf->SetAligns(array('C','C'));
-$pdf->Cell(180,10,iconv( 'UTF-8','cp874' ,"รายชื่อโครงงานที่ยังไม่ยื่นสอบร้อยเปอร์เซ็นต์เมื่อใก้ลครบกำหนด"),0,1,'C');
+$pdf->Cell(180,10,iconv( 'UTF-8','cp874//IGNORE' ,"รายชื่อโครงงานที่ยังไม่ยื่นสอบร้อยเปอร์เซ็นต์เมื่อใก้ลครบกำหนด"),0,1,'C');
  include('../connectdatabase.php'); 
 	 $sql = "select * from project where (year_project<>'$year' OR semester_project<>'$semester') AND id_statusproject <> '0' AND id_statusproject <> '16' AND id_statusproject <> '18' AND id_statusproject <> '17'";
 	$result = mysqli_query($connect, $sql);
 	if(mysqli_num_rows($result)!=0)
 	{
-	$pdf->Row(array( iconv( 'UTF-8','cp874' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874' ,"ชื่อโครงงานพิเศษ")));
+	$pdf->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อโครงงานพิเศษ")));
 	$pdf->SetAligns(array('C','L'));
 	while($rs = mysqli_fetch_array($result))
 	{
-				$pdf->Row(array( iconv( 'UTF-8','cp874' ,$rs[0]),iconv( 'UTF-8','cp874' ,$rs[1]))); 
+				$pdf->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,$rs[0]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[1]))); 
 	}
 	}
 $pdf->Output();

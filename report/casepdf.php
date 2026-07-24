@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 define('FPDF_FONTPATH','font/');
 require('mc_table.php');
@@ -11,17 +11,17 @@ class PDF extends PDF_MC_Table
 		$this->SetFont('angsana','B',16);
   		$this->SetFont('angsana','',14);
 		$year2 = date('Y')+543;
-		$this->Text(10,10,iconv( 'UTF-8','cp874' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
+		$this->Text(10,10,iconv( 'UTF-8','cp874//IGNORE' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
 		$this->SetFont('angsana','B',16);
 		//พิมพ์ตัวหนังสือตัวเอียงๆ ที่ตำแหน่งเยื้องขอบกระดาษซ้าย 5หน่วย ขอบกระดาษบน 5หน่วย
-		$this->Text(50,10,iconv( 'UTF-8','cp874' ,"รายชื่อโครงงานพิเศษที่มีกรณีศึกษา
+		$this->Text(50,10,iconv( 'UTF-8','cp874//IGNORE' ,"รายชื่อโครงงานพิเศษที่มีกรณีศึกษา
  ประจำภาคเรียน ".$_GET["s"]." ปีการศึกษา ".$_GET["y"]));
  
 		//ปัดบรรทัด กำหนดความกว้างของบรรทัด 20หน่วย
 		$this->Ln(10);
 		$this->SetFont('angsana','',12);
 		$this->SetWidths(array(10,75,105));
-		$this->Row(array("",iconv( 'UTF-8','cp874' ,"หน่วยงาน"),iconv( 'UTF-8','cp874' ,"ชื่อโครงงานพิเศษ")));
+		$this->Row(array("",iconv( 'UTF-8','cp874//IGNORE' ,"หน่วยงาน"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อโครงงานพิเศษ")));
 		$this->SetAligns(array('C','L','L'));
 	}
  
@@ -59,7 +59,7 @@ $result = mysqli_query($connect, $sql);
 	$no=1;
 while($rs = mysqli_fetch_array($result))
 {
-				$pdf->Row(array($no,iconv( 'UTF-8','cp874' ,$rs[0]),iconv( 'UTF-8','cp874' ,$rs[1]))); 
+				$pdf->Row(array($no,iconv( 'UTF-8','cp874//IGNORE' ,$rs[0]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[1]))); 
 				$no++;
 }
 	}

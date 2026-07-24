@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 define('FPDF_FONTPATH','font/');
 require('mc_table.php');
@@ -28,7 +28,7 @@ $pdf->AddPage();
 // กำหนดฟอนต์ที่จะใช้  อังสนา ตัวธรรมดา ขนาด 12
 		$pdf->SetFont('angsana','',14);
 		$year2 = date('Y')+543;
-		$pdf->Text(10,10,iconv( 'UTF-8','cp874' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
+		$pdf->Text(10,10,iconv( 'UTF-8','cp874//IGNORE' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
 		$pdf->SetFont('angsana','B',16);
 $pdf->SetFont('angsana','',12);
 $pdf->SetWidths(array(25,100,60));
@@ -46,12 +46,12 @@ while($rs = mysqli_fetch_array($result))
 	if($num==0)
 	{
 		$pdf->SetFont('angsana','B',16);
-		$pdf->Cell(180,20,iconv( 'UTF-8','cp874' ,"รายงานสถานะโครงงานพิเศษของ อาจารย์".$rs[3]),0,1,'C');
+		$pdf->Cell(180,20,iconv( 'UTF-8','cp874//IGNORE' ,"รายงานสถานะโครงงานพิเศษของ อาจารย์".$rs[3]),0,1,'C');
 		$pdf->SetFont('angsana','',12);
-		$pdf->Row(array( iconv( 'UTF-8','cp874' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874' ,"ชื่อโครงงานพิเศษ"),iconv( 'UTF-8','cp874' ,"สถานะโครงงานพิเศษ")));
+		$pdf->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อโครงงานพิเศษ"),iconv( 'UTF-8','cp874//IGNORE' ,"สถานะโครงงานพิเศษ")));
 		$num += 1;
 	}
-				$pdf->Row(array( iconv( 'UTF-8','cp874' ,$rs[0]),iconv( 'UTF-8','cp874' ,$rs[1]),iconv( 'UTF-8','cp874' ,$rs[2]))); 
+				$pdf->Row(array( iconv( 'UTF-8','cp874//IGNORE' ,$rs[0]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[1]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[2]))); 
 				
 }
 	}

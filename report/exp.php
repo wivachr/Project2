@@ -1,4 +1,4 @@
-﻿<? include('../change.php'); ?>
+<? include('../change.php'); ?>
 <?php
 	include('../connectdatabase.php'); 
 	$sql = "select * from academicyear";
@@ -26,19 +26,19 @@ class PDF extends PDF_MC_Table
 		$this->SetFont('angsana','B',16);
  
 		//พิมพ์ตัวหนังสือตัวเอียงๆ ที่ตำแหน่งเยื้องขอบกระดาษซ้าย 5หน่วย ขอบกระดาษบน 5หน่วย
-		$this->Text(90,10,iconv( 'UTF-8','cp874' ,"รายชื่อโครงงานพิเศษที่ยังไม่ยื่นเรื่องสอบร้อยเปอร์เซ็นต์เมื่อเกินเวลาที่กำหนด 2 ภาคเรียน"));
-		$this->Text(130,20,iconv( 'UTF-8','cp874' ,"ประจำภาคเรียนที่ $semester ปีการศึกษา $year"));
-		$this->Text(125,30,iconv( 'UTF-8','cp874' ,'คณะเทคโนโลยีและการจัดการอุตสาหกรรม'));
+		$this->Text(90,10,iconv( 'UTF-8','cp874//IGNORE' ,"รายชื่อโครงงานพิเศษที่ยังไม่ยื่นเรื่องสอบร้อยเปอร์เซ็นต์เมื่อเกินเวลาที่กำหนด 2 ภาคเรียน"));
+		$this->Text(130,20,iconv( 'UTF-8','cp874//IGNORE' ,"ประจำภาคเรียนที่ $semester ปีการศึกษา $year"));
+		$this->Text(125,30,iconv( 'UTF-8','cp874//IGNORE' ,'คณะเทคโนโลยีและการจัดการอุตสาหกรรม'));
    		$this->SetFont('angsana','',14);
 		$year2 = date('Y')+543;
-		$this->Text(10,10,iconv( 'UTF-8','cp874' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
+		$this->Text(10,10,iconv( 'UTF-8','cp874//IGNORE' ,'วันที่ออกรายงาน '.date('d/m/').$year2));
 		$this->SetFont('angsana','B',16);
 		//ปัดบรรทัด กำหนดความกว้างของบรรทัด 20หน่วย
 		$this->Ln(30);
 		$this->SetFont('angsana','',12);
 $this->SetWidths(array(8,30,85,30,50,40,40));
 $this->SetAligns(array('C','C','C','C','C','C'));
-			$this->Row(array("",iconv( 'UTF-8','cp874' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874' ,"ชื่อโครงงานพิเศษ"),iconv( 'UTF-8','cp874' ,"รหัสประจำตัว"),iconv( 'UTF-8','cp874' ,"ชื่อ - สกุล"),iconv( 'UTF-8','cp874' ,"ภาคปีการศึกษาที่ลงทะเบียน"),iconv( 'UTF-8','cp874' ,"สถานะโครงงาน")));
+			$this->Row(array("",iconv( 'UTF-8','cp874//IGNORE' ,"รหัสโครงงานพิเศษ"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อโครงงานพิเศษ"),iconv( 'UTF-8','cp874//IGNORE' ,"รหัสประจำตัว"),iconv( 'UTF-8','cp874//IGNORE' ,"ชื่อ - สกุล"),iconv( 'UTF-8','cp874//IGNORE' ,"ภาคปีการศึกษาที่ลงทะเบียน"),iconv( 'UTF-8','cp874//IGNORE' ,"สถานะโครงงาน")));
 	$this->SetAligns(array('C','C','L','C','L','C','L'));
 	}
  
@@ -102,7 +102,7 @@ $pdf->SetWidths(array(8,30,85,30,50,40,40));
 				 {
 					 $strname .= $namestudent[$i]."\n";
 				 }
-				$pdf->Row(array($no,iconv( 'UTF-8','cp874' ,$rs[0]),iconv( 'UTF-8','cp874' ,$rs[1]),iconv( 'UTF-8','cp874' ,$strid),iconv( 'UTF-8','cp874' ,$strname),iconv( 'UTF-8','cp874' ,$rs[2]."/".$rs[3]),iconv( 'UTF-8','cp874' ,$rs[4]))); 
+				$pdf->Row(array($no,iconv( 'UTF-8','cp874//IGNORE' ,$rs[0]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[1]),iconv( 'UTF-8','cp874//IGNORE' ,$strid),iconv( 'UTF-8','cp874//IGNORE' ,$strname),iconv( 'UTF-8','cp874//IGNORE' ,$rs[2]."/".$rs[3]),iconv( 'UTF-8','cp874//IGNORE' ,$rs[4]))); 
 				$no++;
 	}
 	}

@@ -214,35 +214,54 @@ if(mysqli_num_rows($result)!=0)
   <p>
     <? 			 
    			}
-$sql = "select * from exam,typeexam,statusproject where statusproject.id_statusproject = exam.id_statusproject AND id_project='$idview' AND exam.id_typeexam=typeexam.id_typeexam";
+/*
+ * ดึงคอลัมน์ตามชื่อแทน select * + เลข index เพื่อเลี่ยงบั๊ก offset ที่ขึ้นกับลำดับตารางใน FROM
+ * วันที่จัดสอบดึงด้วย subquery ไม่ใช่ join เพราะ 1 exam อาจมี assignexam ได้หลายแถว
+ * (เช่น id_exam=2209 มี 3 แถว) ซึ่ง join ตรง ๆ จะทำให้ประวัติการสอบแสดงซ้ำ
+ */
+$sql = "select typeexam.name_typeexam,
+               exam.date_submitexam,
+               statusproject.name_statusproject,
+               exam.comment_exam,
+               (select assignexam.date_assignexam from assignexam
+                 where assignexam.id_exam = exam.id_exam
+                 order by assignexam.id_assignexam desc limit 1) as date_assignexam
+          from exam,typeexam,statusproject
+         where statusproject.id_statusproject = exam.id_statusproject
+           AND exam.id_project='$idview'
+           AND exam.id_typeexam=typeexam.id_typeexam
+         order by exam.id_exam";
 $result = mysqli_query($connect, $sql);
 if(mysqli_num_rows($result)!=0)
 {
 	?>
 <center><h2>ประวัติการสอบ</h2></center>
-<table width="520" border="0" align="center">
+<table width="620" border="0" align="center">
       <tr>
         <th width="107" bgcolor="#CCCCCC" scope="row">ประเภทการสอบ</th>
-        <th width="74" bgcolor="#CCCCCC">วันที่สอบ</th>
+        <th width="80" bgcolor="#CCCCCC">วันที่รับเรื่อง</th>
+        <th width="80" bgcolor="#CCCCCC">วันที่จัดสอบ</th>
         <th width="87" bgcolor="#CCCCCC">สถานะการสอบ</th>
         <th width="204" bgcolor="#CCCCCC">ความคิดเห็นของคณะกรรมการ</th>
   </tr>
     <?
 while($rs = mysqli_fetch_array($result))
 {
-	$date2 = explode("-", $rs[3]);
+	$date2 = explode("-", $rs['date_submitexam']);
+	$date3 = explode("-", (string)$rs['date_assignexam']);
 	?>
       <tr>
-        <td valign="top" scope="row"><?=$rs[9]?></td>
-        <td valign="top"><? if($rs[3]=="0000-00-00"){echo "ยังไม่ได้ยื่นเรื่อง";}else{echo $date2[2]."/".$date2[1]."/".$date2[0];}?></td>
-        <td valign="top"><?=$rs[11]?></td>
-        <td valign="top"><? if($rs[5]==""){echo "ไม่มีความคิดเห็น";}else{echo $rs[5];}?></td>
+        <td valign="top" scope="row"><?=$rs['name_typeexam']?></td>
+        <td valign="top"><? if($rs['date_submitexam']=="0000-00-00"){echo "ยังไม่ได้รับเรื่อง";}else{echo $date2[2]."/".$date2[1]."/".$date2[0];}?></td>
+        <td valign="top"><? if(empty($rs['date_assignexam'])||$rs['date_assignexam']=="0000-00-00"){echo "ยังไม่ได้จัดสอบ";}else{echo $date3[2]."/".$date3[1]."/".$date3[0];}?></td>
+        <td valign="top"><?=$rs['name_statusproject']?></td>
+        <td valign="top"><? if($rs['comment_exam']==""){echo "ไม่มีความคิดเห็น";}else{echo $rs['comment_exam'];}?></td>
       </tr>
     <?
 }
 ?>
       <tr>
-        <th colspan="4" bgcolor="#CCCCCC" scope="row">&nbsp;</th>
+        <th colspan="5" bgcolor="#CCCCCC" scope="row">&nbsp;</th>
   </tr>
 </table>
 <?

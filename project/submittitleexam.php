@@ -47,8 +47,14 @@
 	$row = mysqli_fetch_array($res);
 	$id  = (int)$row[0] + 1;
 
+	// date_submitexam ต้องเป็นวันที่ที่ใช้ได้จริง: production (Ubuntu/MySQL 8.0) เปิด
+	// STRICT_TRANS_TABLES + NO_ZERO_DATE เป็นค่าเริ่มต้น จึงปฏิเสธค่า '' ที่เคยกลายเป็น
+	// 0000-00-00 บน MariaDB ของ XAMPP (dev) -> insert ล้ม "ทุกครั้ง" บน production
+	// ทำให้เจ้าหน้าที่ไม่เห็นการยื่นสอบ. ใช้รูปแบบ พ.ศ. เดียวกับ project/approve*exam.php
+	$datesubmit = $year.date("-n-j");
+
 	// (4) เช็คผล insert ก่อน แล้วจึงค่อยเดินสถานะ project
-	$ok = mysqli_query($connect, "insert into exam values('$id','$idproject','$typeexam','','20','','$year','$semester')");
+	$ok = mysqli_query($connect, "insert into exam values('$id','$idproject','$typeexam','$datesubmit','20','','$year','$semester')");
 	if($ok){
 		mysqli_query($connect, "update project set id_statusproject='$poststatus' where id_project='$idproject'");
 	}

@@ -91,6 +91,34 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
 
 โฟลเดอร์ปี-เทอมเก่า (`2553-1` ถึง `2569-1`, ~40 โฟลเดอร์) ที่มีอยู่ใน repo ปัจจุบันคือ **ข้อมูลที่แอปสร้างขึ้นเอง** ไม่ใช่ source code — ต้อง copy ข้อมูลจริงเหล่านี้ไปเครื่องใหม่ด้วย (ปกติ `.gitignore` กันไว้ไม่ให้เข้า git อยู่แล้ว)
 
+## 3.1 [ข้อมูลจริงหลัง deploy แล้ว] path และคำสั่งที่ใช้จริงบนเซิร์ฟเวอร์
+
+ระบบขึ้น production จริงแล้ว ค่าที่ยืนยันแล้ว (ต่างจากตัวอย่างในเอกสารนี้ อย่าเดาเอง):
+
+| รายการ | ค่าจริง |
+|---|---|
+| DocumentRoot | **`/var/www/html/Project2`** (ค่าเริ่มต้นของ Ubuntu คือ `/var/www/html` ไม่ใช่ `/var/www`) |
+| บัญชี SSH | `itsv@itsv` |
+| เซิร์ฟเวอร์ฐานข้อมูล | MySQL **8.0.46** (`8.0.46-0ubuntu0.24.04.3`) |
+
+หา DocumentRoot จริงเมื่อไม่แน่ใจ: `grep -ri DocumentRoot /etc/apache2/sites-enabled/` (Linux แยกตัวพิมพ์เล็ก-ใหญ่ ต่างจาก Windows)
+
+**สิทธิ์ไฟล์**: ไฟล์ `.php` ให้เป็นของผู้ deploy สิทธิ์ `644` พอ — **อย่า `chown www-data` ให้ไฟล์ source** เพราะจะทำให้เว็บเซิร์ฟเวอร์เขียนทับโค้ดตัวเองได้ (ประกอบกับช่องโหว่อัปโหลดไฟล์ในข้อ 2.4 ของ `SYSTEM_ANALYSIS_AND_ROADMAP.md` จะยิ่งอันตราย) เฉพาะโฟลเดอร์ที่แอปต้องเขียนจริงตามข้อ 3 เท่านั้นที่ต้องเป็นของ `www-data`
+
+**หลังคัดลอกไฟล์ทุกครั้งต้อง reload** ไม่งั้น opcache อาจยังรันโค้ดเก่า:
+```bash
+sudo systemctl reload apache2     # หรือ: sudo systemctl restart php8.2-fpm
+```
+
+**สำรองฐานข้อมูล**: `mysqldump` ของ MySQL 8 จะฟ้อง `Access denied; you need (at least one of) the PROCESS privilege(s) ... when trying to dump tablespaces` ให้เติม `--no-tablespaces` (ทุกตารางเป็น MyISAM จึงไม่มี tablespace ให้เสียอยู่แล้ว) — **อย่าไปเพิ่มสิทธิ์ `PROCESS` ให้ user** เพราะเกินความจำเป็น
+```bash
+mysqldump --no-tablespaces -u<user> -p projectinformationsystem exam project > ~/backup_$(date +%F).sql
+tail -3 ~/backup_$(date +%F).sql     # ต้องจบด้วย "-- Dump completed"
+```
+> ระวัง: คำสั่งที่ error ไปแล้ว **ยังทิ้งไฟล์ไม่สมบูรณ์ไว้** (shell สร้างไฟล์ก่อน mysqldump จะล้มเหลว) อย่าเชื่อว่าสำรองสำเร็จจนกว่าจะเห็นบรรทัด `-- Dump completed`
+
+ถ้าใช้ phpMyAdmin แทนก็ได้ ไม่ติดปัญหาสิทธิ์ `PROCESS` (แท็บ Export → Custom → เลือกตาราง → Go)
+
 ## 4. ย้ายฐานข้อมูล
 
 - Schema/ข้อมูลอยู่ที่ `projectinformationsystem.sql` (root โปรเจกต์, ไม่ถูก track ใน git — ต้อง copy ไฟล์นี้ไปด้วยตรง ๆ หรือ `mysqldump` จากเครื่อง dev ปัจจุบันใหม่)
@@ -131,11 +159,11 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
    ```apache
    <VirtualHost *:443>
        ServerName <hostname-หรือ-IP>
-       DocumentRoot /var/www/Project2
+       DocumentRoot /var/www/html/Project2
        SSLEngine on
        SSLCertificateFile /etc/ssl/project2/project2.crt
        SSLCertificateKeyFile /etc/ssl/project2/project2.key
-       <Directory /var/www/Project2>
+       <Directory /var/www/html/Project2>
            AllowOverride All
            Require all granted
        </Directory>
@@ -176,7 +204,7 @@ $passwd = "";              // ว่างเปล่า — ใช้ได้
 - [ ] Login ได้ทั้ง 4 สิทธิ์ (admin/officer/teacher/student)
 - [ ] อัปโหลดไฟล์ PDF (ทก.01, เล่มปริญญานิพนธ์, ข่าวประกาศ) สำเร็จ และไฟล์เขียนลงโฟลเดอร์ถูกต้อง
 - [ ] นำเข้าไฟล์ `.xlsx` (นักศึกษา/ลงทะเบียน) ทำงานได้
-- [ ] พิมพ์รายงาน PDF (FPDF) แสดงภาษาไทยถูกต้อง ไม่มีตัวอักษรเพี้ยน
+- [ ] พิมพ์รายงาน PDF (FPDF) แสดงภาษาไทยถูกต้อง ไม่มีตัวอักษรเพี้ยน — และต้อง**ไม่ขึ้น `FPDF error: Some data has already been output`** ถ้าขึ้น แปลว่าไฟล์นั้นถูกบันทึกกลับมาพร้อม UTF-8 BOM หรือมี warning/notice หลุดออกมาก่อน (ดูหัวข้อ FPDF ใน `CLAUDE.md`) ควรไล่กดทุกเมนูในหน้า "ออกรายงาน" เพราะทั้ง 13 ไฟล์เคยพังพร้อมกันมาก่อนโดยไม่มีใครสังเกต
 - [ ] ข้อมูลเก่า (โฟลเดอร์ปี-เทอม, `news/uploads/`) ถูกย้ายมาครบและอ่าน/เขียนได้
 - [ ] ลบ/ไม่ deploy ไฟล์ `report/font/desktop.ini` (ไฟล์ metadata ของ Windows Explorer ที่หลงเหลืออยู่ ไม่ใช่ source code)
 - [ ] เข้าเว็บผ่าน `https://` ได้โดยไม่มี mixed-content warning ในหน้าไหนเลย (ไม่ควรมี เพราะไม่มี hardcode `http://` ในโค้ด แต่ควรเช็คจริงด้วยตา/console ของเบราว์เซอร์)

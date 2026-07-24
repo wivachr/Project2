@@ -81,6 +81,8 @@ Project2/
 
 ## หมายเหตุสำหรับนักพัฒนา
 
+- **Production รันบน Ubuntu + MySQL 8.0 ซึ่งเปิด STRICT mode** ส่วน dev เป็น XAMPP/MariaDB ที่ไม่เปิด — โค้ดที่เขียน `''` ลงคอลัมน์ `date`/`int` จะ "ทำงานบนเครื่องตัวเองแต่พังเงียบ ๆ บนเซิร์ฟเวอร์" แนะนำตั้ง `sql_mode` ของ dev ให้ตรง production (ดู [UBUNTU_MIGRATION.md](UBUNTU_MIGRATION.md) §0.1)
+- **ห้ามบันทึกไฟล์ที่สร้าง PDF พร้อม UTF-8 BOM** — FPDF รุ่นที่ใช้อยู่จะปฏิเสธทันที (`Some data has already been output`) ดู [CLAUDE.md](CLAUDE.md)
 - รหัสผ่านเก็บเป็น **MD5 (unsalted)** — ห้ามเปลี่ยนโดยไม่ migrate ข้อมูล
 - การนำทางใช้ jQuery `.load()` โหลด fragment เข้า `#showmanage` — fragment ห้ามมี `<html>/<head>/<body>`
 - ทุก `.load()` ต่อท้าย `?pop=Math.random()` เพื่อป้องกัน browser cache

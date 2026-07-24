@@ -125,10 +125,41 @@ Fixed by writing a real Buddhist-era date (`$year` from `academicyear` + current
 
 Documented in `UBUNTU_MIGRATION.md` §0.1 (the original migration audit missed `sql_mode` entirely) and `CLAUDE.md`.
 
-### Known residue not yet cleaned
-The live data still carries the historical fallout of Defect 1: `exam` rows with `id_project=0` (largely artifacts of the unauthenticated GET sweep described below, which used to create a junk row per call — the new guards make that impossible), and duplicate pending (status 20) rows for the same project+exam type. These are invisible-or-duplicated entries in the officer's list; cleaning them requires re-running the diagnostics against current production data rather than reusing any earlier row list, and previewing with `SELECT` before any `DELETE`.
+### Deployment and data repair (completed 2026-07-24)
 
-**Not yet deployed:** both fixes are committed locally only. Production keeps failing every submission until the updated `project/submit*exam.php` files are deployed to the Ubuntu server.
+Both fixes were deployed to production and verified there, then the damaged data was repaired:
+
+- **Production layout confirmed.** DocumentRoot is `/var/www/html/Project2` (Ubuntu's default `/var/www/html`), not the `/var/www/Project2` used as a sample path in `UBUNTU_MIGRATION.md`. Verified the deploy by grepping the server: all three `submit*exam.php` contain both `datesubmit` and `GET_LOCK`, and `regis/registerproject.php` greps 1 for `GET_LOCK`, so the earlier `e77880b` set was already live. PHP sources should stay owned by the deploy user at mode 644 — only `news/uploads/` and the `<year>-<sem>/` folders need `www-data` ownership, since chown-ing source to the web server would let it rewrite its own code.
+- **Verified live**: a real submission was made and appeared in the officer's รับเรื่องการสอบ list.
+- **12 lost submissions restored** (`id_exam` 3092–3103) for projects 691023, 691025, 691029, 691031, 691033–691039, 691042 — all had ทก.01 uploaded and sat at status 2 with no `exam` row. Students did not have to resubmit. Note it was **12, not the 11** visible in the dump: 691023 was submitted and lost in the window between the dump (02:34) and the deploy, which is exactly why the repair query re-discovers victims from live data instead of reusing an earlier list.
+- **Duplicate pending row removed**: project 671047 had two identical pending 100%-exam rows (`id_exam` 2942 and 2943), so it appeared twice in the officer's list; 2943 was deleted after confirming no `assignexam` referenced either. A follow-up scan for any remaining visible duplicates returned empty.
+- `mysqldump` on the server fails with `Access denied; you need (at least one of) the PROCESS privilege(s) ... when trying to dump tablespaces`. Add `--no-tablespaces`; every table here is MyISAM so nothing is lost. Note the failed command still leaves a truncated file behind (the shell creates it before mysqldump errors), so always check the dump ends with `-- Dump completed` before trusting it as a backup.
+
+### Known residue not yet cleaned
+The live data still carries older fallout of Defect 1 that is *not* user-visible: 117 `exam` rows with `id_project=0` (largely artifacts of the unauthenticated GET sweep described below, which used to create a junk row per call — the new guards make that impossible), and 34 duplicate pending groups whose projects are no longer at status 2/7/11, so they don't surface in the officer's list. The one duplicate that *was* visible (project 671047) has been removed. Cleaning the rest is optional housekeeping; it requires re-running the diagnostics against current production data rather than reusing any earlier row list, and previewing with `SELECT` before any `DELETE`.
+
+Also still open: 27 `project` rows with a blank `name_project` (one of them, `681098`, currently shows as a nameless entry in the officer's pending list) — a pre-existing issue awaiting a decision, not caused by these defects.
+
+## Session — 2026-07-24 (all PDF reports broken; exam-history columns)
+
+### Every PDF report failed, since the initial commit (commit `d2b1575`)
+An officer hit `FPDF error: Some data has already been output, can't send PDF file` on `report/tableexam.php`. It reproduced identically on the dev box and the file's BOM is present in the initial commit, so this was never a regression — **all 13 reports that call `->Output()` had been broken from day one** and simply hadn't been exercised. Two independent causes, both fixed:
+
+1. **UTF-8 BOM.** 223 `.php` files here start with `EF BB BF`. Harmless for HTML pages (output buffering absorbs it, browsers ignore it — which is why the rest of the app works), but the bundled FPDF is an old release whose `Output()` does a bare `if(ob_get_length()) $this->Error(...)` with no BOM/whitespace tolerance, unlike newer FPDF which `ob_clean()`s such a buffer. Three bytes were enough. Stripped from the 13 report files only; the other ~210 are unaffected and rewriting them all would be a much larger, riskier change.
+2. **`iconv()` aborting on characters outside cp874.** Reports convert to cp874 for the embedded Thai fonts; iconv emits a Notice on an unconvertible character, and that Notice is output, tripping the same FPDF check — so a single bad character anywhere in the result set killed the entire report. All 184 conversions across 17 files now use `'cp874//IGNORE'`. `report/font/angsa*.php` also contain `$enc='cp874'` but that is the font's encoding name, not an iconv target; a blanket replace hits them and was reverted.
+
+Verified over HTTP: all 13 return `application/pdf` starting with `%PDF-1.3`, using real parameters where required (`?t=`, `?teacher=`, `?y=&s=`).
+
+The three project names that triggered cause 2 are a **data** problem still open: `591002` and `642023` contain U+F70B (a Private Use Area mai-tho from an old Thai font encoding) and `672005` contains U+0161 (`š`) — all three are a corrupted Thai ้. The reports render without them now, but the names display wrong throughout the app.
+
+### Exam-history table: blank status column, then new columns (commits `f184ef7`, `ef742bb`, `39675f5`)
+`project/viewexam.php` (student's ดูประวัติการสอบ) rendered an empty "สถานะการสอบ" for every student: it read `$rs[25]`, which in its own query is `project.parent_project_id` (NULL for normal projects) rather than `statusproject.name_statusproject` at `$rs[27]`. This is the third instance of the positional-offset bug class in this report. The near-identical table in `project/viewproject.php` was correct at `$rs[11]` only because *its* query omits the `project` table.
+
+Then, by request, both tables were relabelled and extended: "วันที่สอบ" → **"วันที่รับเรื่อง"** (the column is `exam.date_submitexam`, which `approve*exam.php` overwrites with the officer's acceptance date, so the old label was wrong), plus a new **"วันที่จัดสอบ"** column reading `assignexam.date_assignexam`.
+
+That date is fetched with a correlated subquery rather than a join, because `assignexam` can hold several rows per `id_exam` (exam 2209 owns 3; 46 junk rows sit at `id_exam=0`) and joining multiplies the history rows — verified that a plain join returned 4 rows for the student owning exam 2209 against the correct 2. Missing values are labelled ("ยังไม่ได้รับเรื่อง" / "ยังไม่ได้จัดสอบ"); the subquery returns NULL for the ~289 exams never scheduled, so an `empty()` check is needed and not just `=='0000-00-00'`.
+
+Both files were also moved off `select *` + positional indices onto named columns with associative access, since adding a column to a `select *` join otherwise means re-counting every offset — precisely how this bug class keeps reappearing. `project/viewexam.php` keeps its raw date format and `project/viewproject.php` its `d/m/Y` format, as before.
 
 ## Testing methodology notes
 

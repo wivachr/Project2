@@ -30,11 +30,14 @@
 		mysqli_close($connect); exit;
 	}
 
-	// (3) กันยื่นซ้ำ: ต้องไม่มีคำขอที่ยังค้าง (status 20) ของประเภทการสอบนี้อยู่แล้ว
-	$dup = mysqli_query($connect, "select id_exam from exam where id_project='$idproject' AND id_typeexam='$typeexam' AND id_statusproject='20' limit 1");
+	// (3) กันยื่นซ้ำ: บล็อกถ้าการสอบประเภทนี้ผ่านแล้ว (24) หรือกำลังอยู่ในกระบวนการ
+	//     -- รอยืนยัน (20) หรือ นัดสอบแล้ว (21). สถานะ "ไม่ผ่าน" (22/23/25) ไม่บล็อก
+	//     เพราะต้องยื่นสอบใหม่ได้. เดิมเช็คแค่ 20 จึงยังยื่นซ้ำหลังผ่าน/หลังนัดสอบได้
+	$dup = mysqli_query($connect, "select id_statusproject from exam where id_project='$idproject' AND id_typeexam='$typeexam' AND id_statusproject IN ('20','21','24') order by field(id_statusproject,'24','21','20') limit 1");
 	if($dup && mysqli_num_rows($dup)>0){
+		$d = mysqli_fetch_assoc($dup);
 		mysqli_query($connect, "SELECT RELEASE_LOCK('$lockName')");
-		echo 'มีการยื่นสอบรายการนี้อยู่แล้ว';
+		echo ($d['id_statusproject']=='24') ? 'การสอบประเภทนี้ผ่านแล้ว ไม่ต้องยื่นซ้ำ' : 'มีการยื่นสอบรายการนี้อยู่แล้ว';
 		mysqli_close($connect); exit;
 	}
 

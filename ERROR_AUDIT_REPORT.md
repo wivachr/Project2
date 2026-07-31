@@ -161,6 +161,23 @@ That date is fetched with a correlated subquery rather than a join, because `ass
 
 Both files were also moved off `select *` + positional indices onto named columns with associative access, since adding a column to a `select *` join otherwise means re-counting every offset — precisely how this bug class keeps reappearing. `project/viewexam.php` keeps its raw date format and `project/viewproject.php` its `d/m/Y` format, as before.
 
+## Session — 2026-07-25 (team-member integrity + duplicate/junk exam cleanup)
+
+### Adding/editing team members validated nothing (commits `867b9ad`, `e5c0bd8`)
+`project/addmanipulator.php` and `addmanipulator2.php` (student and officer "add member" paths) checked only that the field was non-blank, so a member could be added twice, a non-existent student id could be entered, and a student already in another group this term could be pulled in ("แย่งเพื่อน"). All three were reproduced over HTTP before fixing. The real-world overlaps came from a fourth gap: `regis/registerproject.php` relied on `regis/check_ajax/canuse.php` to block a student who already has a project this term, but that check runs only in client-side JS on blur — nothing revalidated on submit, so a double-clicked registration created a second project (e.g. 691019/691020, 691041/691042: same project name, consecutive ids, same student).
+
+Fixed with the same three-part guard in all the write paths (student must exist in `student`; not already in this project; not in another active project this term, ignoring statuses 0 and 18) plus a server-side recheck inside `registerproject.php`'s existing `GET_LOCK` section. Critically, `project/editmanipulator2.php` — the live *edit* path for both portals — had no validation at all and would otherwise let anyone bypass the add guards (add a valid member, then edit the row's `id_student` to anything); it got the same guard, with the duplicate check excluding the row being edited so a phone-only edit still works. Deleted the dead `project/editmanipulator.php` (its INSERT gave 3 values for 4 columns → always `ERROR 1136`, and nothing referenced it).
+
+### Re-submitting an already-passed exam (commit `b9af305`)
+The earlier dedupe guard on the submit handlers only blocked a *pending* (status 20) row, so an exam could still be submitted after it had passed (status 24) or been scheduled (21). Widened the check in all three `submit*exam.php` to reject when a same-type exam is passed/pending/scheduled (failed states 22/23/25 still allow a resubmit). A sweep found 65 project+type groups carrying this leftover.
+
+### Production data cleanup
+- **Duplicate passed-exam rows:** 118 `exam` rows (116 at status 20, 2 at 21) that duplicated an already-passed (24) exam of the same type were deleted FK-safely (1 `assignexam` child first) after confirming none carried a recorded result. Verify returned 0. Script: `scratchpad/cleanup_duplicate_passed_exams.sql`. The `DELETE` must use a self-JOIN, not `WHERE EXISTS` (MySQL error 1093 forbids referencing the delete target in a subquery).
+- **Test project 681098 deleted:** a blank-name registration with a blank `id_student` and `id_subject=0`/`id_teacher=0`; removed in FK order (committee → exam → manipulator → project → user, keyed on `username='681098'`). It had only shown up because the earlier lost-submission repair had given it an `exam` row.
+- **Status corrected to 14 (สอบร้อยผ่านแล้ว):** exactly 2 projects had passed the 100% exam (a `type2 status24` row) yet sat at a pre-pass status — 671047 (was 11) and 681039 (was 6). Not 16, since 16 also implies the final thesis/TK.01 submission. Projects that passed only the *title* exam (661023, 671016 at 6; 681051 at 12) are correct and were left alone.
+- **Stuck title exam 2884 (project 681031):** its title exam sat at status 21 though the project had passed the 100% exam and completed (proj status 16), so it lingered on the officer's edit-schedule page (`exam/editassignexam.php`, which lists `exam.id_statusproject='21'`). Set to 24 — the only such anomaly DB-wide.
+- **id_project=0 orphans:** ~360 rows across `exam`(117), `manipulator`(157), `committee`(2), `projecthistory`(45), `coadvisor`(39), plus 46 `assignexam` rows at `id_exam=0` — leftovers from the pre-guard add/submit handlers writing an empty project/exam reference. Confirmed safe: every one of the 68 real-student `manipulator` rows also had a valid membership elsewhere, so none was a student's only record.
+
 ## Testing methodology notes
 
 Fatal-error and warning sweeps were done via direct unauthenticated `GET` requests (no session, no POST body) to every `.php` file. This means:
